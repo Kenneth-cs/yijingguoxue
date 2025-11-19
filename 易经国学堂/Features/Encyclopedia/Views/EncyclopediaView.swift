@@ -12,36 +12,39 @@ struct EncyclopediaView: View {
     @EnvironmentObject var storageService: StorageService
     @State private var searchText = ""
     @State private var selectedSegment: Int
+    let initialSegment: Int
     
     // 添加初始化参数，允许指定默认选中的tab
     init(initialSegment: Int = 0) {
+        self.initialSegment = initialSegment
         _selectedSegment = State(initialValue: initialSegment)
     }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // 分段控制器
-                Picker("类型", selection: $selectedSegment) {
-                    Text("六十四卦").tag(0)
-                    Text("八卦").tag(1)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding()
-                .padding(.horizontal, DeviceType.isPad ? 40 : 0)
-                .centerContent()
-                
-                // 内容区域
-                if selectedSegment == 0 {
-                    HexagramListView(searchText: searchText)
-                } else {
-                    TrigramListView()
-                }
+        VStack(spacing: 0) {
+            // 分段控制器
+            Picker("类型", selection: $selectedSegment) {
+                Text("六十四卦").tag(0)
+                Text("八卦").tag(1)
             }
-            .navigationTitle("易经百科")
-            .searchable(text: $searchText, prompt: "搜索卦象")
+            .pickerStyle(SegmentedPickerStyle())
+            .padding()
+            .padding(.horizontal, DeviceType.isPad ? 40 : 0)
+            .centerContent()
+            
+            // 内容区域
+            if selectedSegment == 0 {
+                HexagramListView(searchText: searchText)
+            } else {
+                TrigramListView()
+            }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
+        .navigationTitle("易经百科")
+        .searchable(text: $searchText, prompt: "搜索卦象")
+        .onAppear {
+            // 确保每次进入页面时都设置正确的segment
+            selectedSegment = initialSegment
+        }
     }
 }
 

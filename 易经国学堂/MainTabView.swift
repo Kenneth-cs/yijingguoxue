@@ -52,11 +52,14 @@ struct MainTabView: View {
                 .tag(0)
             
             // 百科
-            EncyclopediaView()
-                .tabItem {
-                    Label("百科", systemImage: "book.fill")
-                }
-                .tag(1)
+            NavigationView {
+                EncyclopediaView()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .tabItem {
+                Label("百科", systemImage: "book.fill")
+            }
+            .tag(1)
             
             // 练习
             PracticeView()

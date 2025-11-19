@@ -106,9 +106,10 @@ struct ProfileView: View {
                 Label("用户协议", systemImage: "doc.text")
             }
             
-            Button(action: {}) {
-                Label("分享应用", systemImage: "square.and.arrow.up")
-            }
+            // 分享功能已隐藏
+            // Button(action: {}) {
+            //     Label("分享应用", systemImage: "square.and.arrow.up")
+            // }
         } header: {
             Text("设置")
         }
