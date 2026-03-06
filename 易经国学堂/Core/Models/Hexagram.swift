@@ -17,6 +17,16 @@ struct Hexagram: Identifiable, Codable, Hashable {
     let binary: String               // 二进制表示，如"111111"
     let description: String          // 卦辞
     let interpretation: String       // 白话释义
+    
+    // MARK: - 新增字段 (v1.1)
+    let pinyin: String?              // 拼音（如 "qián"）
+    let structure: String            // 结构（如 "上乾下乾"）
+    let image: String                // 大象/意象（如 "天行健" 或 "火在山上"）
+    let summary: String              // 概括短语（如 "刚健中正，自强不息"）
+    let tuan: String                 // 彖传内容
+    let greatXiang: String           // 大象传内容
+    let fortune: String              // 运势详解
+    
     let lines: [Line]                // 六爻
     let symbol: String               // 卦象符号（用于显示）
     
@@ -60,6 +70,13 @@ extension Hexagram {
         binary: "111111",
         description: "乾：元，亨，利，贞。",
         interpretation: "乾卦象征天，具有刚健、进取的特性。元亨利贞是《周易》中最吉祥的卦辞，代表万事开头、亨通顺利、有利于坚守正道。",
+        pinyin: "qián",
+        structure: "上乾下乾",
+        image: "天行健",
+        summary: "刚健中正，自强不息",
+        tuan: "大哉乾元，万物资始，乃统天。云行雨施，品物流形。大明终始，六位时成，时乘六龙以御天。乾道变化，各正性命，保合太和，乃利贞。首出庶物，万国咸宁。",
+        greatXiang: "天行健，君子以自强不息。",
+        fortune: "万事如意，名利双收，但需防盛极必衰。",
         lines: [
             Line(position: 1, text: "初九：潜龙，勿用。", interpretation: "龙潜伏在深处，暂时不要行动。", isYang: true),
             Line(position: 2, text: "九二：见龙在田，利见大人。", interpretation: "龙出现在田野，有利于见到大人物。", isYang: true),
