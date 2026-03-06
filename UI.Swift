@@ -389,7 +389,7 @@ struct ContentView: View {
       .offset(x: 0, y: 436.50)
       ZStack() {
         ZStack() {
-          Text("易经学院")
+          Text("易经国学堂")
             .font(Font.custom("WenQuanYi Zen Hei", size: 20).weight(.bold))
             .lineSpacing(25)
             .foregroundColor(Color(red: 0.03, green: 0.42, blue: 0.32))
@@ -416,7 +416,7 @@ struct ContentView: View {
         ZStack() {
           ZStack() {
             ZStack() {
-              Text("今日一卦")
+              Text("每日一卦")
                 .font(
                   Font.custom("Abhaya Libre SemiBold", size: 14).weight(.semibold)
                 )

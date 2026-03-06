@@ -96,19 +96,19 @@ struct SymbolGameView: View {
                                 if let question = game.currentQuestion,
                                    let hexagram = dataService.getHexagram(by: question.hexagramId) {
                                     
-                                    // Main Card
-                                    VStack(spacing: 20) {
+                                    // Main Card（缩小卦象区域高度）
+                                    VStack(spacing: 16) {
                                         // Hexagram Symbol
                                         ZStack {
-                                            RoundedRectangle(cornerRadius: 24)
+                                            RoundedRectangle(cornerRadius: 20)
                                                 .fill(Color.white)
                                                 .shadow(color: Color(hex: "086B52").opacity(0.05), radius: 10, y: 8)
                                             
-                                            VStack(spacing: 24) {
-                                                // Binary Symbol (Thick lines)
-                                                HexagramSymbolView(hexagram: hexagram, size: 160, color: Color(hex: "0F1729"))
+                                            VStack(spacing: 16) {
+                                                // Binary Symbol（缩小size从160到110）
+                                                HexagramSymbolView(hexagram: hexagram, size: 110, color: Color(hex: "0F1729"))
                                                 
-                                                VStack(spacing: 8) {
+                                                VStack(spacing: 6) {
                                                     Text("STEP \(game.currentQuestionIndex + 1)")
                                                         .font(AppConstants.Fonts.bold(10))
                                                         .foregroundColor(Color(hex: "086B52"))
@@ -122,9 +122,9 @@ struct SymbolGameView: View {
                                                         .foregroundColor(Color(hex: "94A3B8"))
                                                 }
                                             }
-                                            .padding(.vertical, 30)
+                                            .padding(.vertical, 20)
                                         }
-                                        .frame(height: 320)
+                                        .frame(height: 240)
                                         .padding(.horizontal, 20)
                                         
                                         // Options Grid

@@ -74,16 +74,19 @@ struct MainTabView: View {
             .tag(1)
 
             // 练习 - 自定义图标
-            PracticeView()
-                .tabItem {
-                    Label {
-                        Text("练习")
-                    } icon: {
-                        Image("tab_练习")
-                            .renderingMode(.template)
-                    }
+            NavigationView {
+                PracticeView()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .tabItem {
+                Label {
+                    Text("练习")
+                } icon: {
+                    Image("tab_练习")
+                        .renderingMode(.template)
                 }
-                .tag(2)
+            }
+            .tag(2)
 
             // 我的 - 自定义图标
             ProfileView()

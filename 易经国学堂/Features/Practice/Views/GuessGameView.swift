@@ -47,51 +47,51 @@ struct GuessGameView: View {
                         gameHeader(game: game)
                         
                         ScrollView {
-                            VStack(spacing: 24) {
+                            VStack(spacing: 16) {
                                 // Hexagram Card
                                 if let question = game.currentQuestion,
                                    let hexagram = dataService.getHexagram(by: question.hexagramId) {
                                     
-                                    VStack(spacing: 16) {
-                                        // Card with Symbol
+                                    VStack(spacing: 12) {
+                                        // Card with Symbol（缩小高度以留出空间给按钮）
                                         ZStack {
-                                            RoundedRectangle(cornerRadius: 24)
+                                            RoundedRectangle(cornerRadius: 20)
                                                 .fill(Color(hex: "F5F7F7"))
-                                                .frame(width: 192, height: 224)
+                                                .frame(width: 170, height: 180)
                                                 .overlay(
-                                                    RoundedRectangle(cornerRadius: 24)
+                                                    RoundedRectangle(cornerRadius: 20)
                                                         .stroke(Color(hex: "086B52").opacity(0.05), lineWidth: 1)
                                                 )
                                             
-                                            RoundedRectangle(cornerRadius: 24)
+                                            RoundedRectangle(cornerRadius: 20)
                                                 .fill(Color.white)
-                                                .frame(width: 192, height: 192)
+                                                .frame(width: 170, height: 155)
                                                 .overlay(
-                                                    RoundedRectangle(cornerRadius: 24)
+                                                    RoundedRectangle(cornerRadius: 20)
                                                         .stroke(Color(hex: "086B52").opacity(0.05), lineWidth: 1)
                                                 )
-                                                .offset(y: -16)
+                                                .offset(y: -12)
                                             
                                             // Hexagram Symbol
-                                            HexagramSymbolView(hexagram: hexagram, size: 120, color: Color(hex: "086B52"))
-                                                .offset(y: -16)
+                                            HexagramSymbolView(hexagram: hexagram, size: 90, color: Color(hex: "086B52"))
+                                                .offset(y: -12)
                                         }
-                                        .frame(height: 240)
+                                        .frame(height: 190)
                                         
-                                        VStack(spacing: 8) {
+                                        VStack(spacing: 4) {
                                             Text("识其形，辩其义")
-                                                .font(AppConstants.Fonts.medium(16))
+                                                .font(AppConstants.Fonts.medium(14))
                                                 .foregroundColor(Color(hex: "086B52").opacity(0.8))
                                             
                                             Text("请选择正确的卦名")
-                                                .font(AppConstants.Fonts.bold(20))
+                                                .font(AppConstants.Fonts.bold(18))
                                                 .foregroundColor(Color(hex: "0F1729"))
                                         }
                                     }
-                                    .padding(.top, 20)
+                                    .padding(.top, 16)
                                     
                                     // Options
-                                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                                         ForEach(question.options, id: \.self) { option in
                                             OptionCard(
                                                 text: option,
@@ -107,35 +107,41 @@ struct GuessGameView: View {
                                         }
                                     }
                                     .padding(.horizontal, 20)
-                                    
-                                    // Action Buttons
-                                    VStack(spacing: 16) {
-                                        Button(action: submitAnswer) {
-                                            Text(showingResult ? "下一题" : "提交答案")
-                                                .font(AppConstants.Fonts.bold(16))
-                                                .foregroundColor(.white)
-                                                .frame(maxWidth: .infinity)
-                                                .frame(height: 56)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .fill(selectedAnswer == nil && !showingResult ? Color(hex: "086B52").opacity(0.5) : Color(hex: "086B52"))
-                                                )
-                                        }
-                                        .disabled(selectedAnswer == nil && !showingResult)
-                                        
-                                        if !showingResult {
-                                            Button("跳过此题") {
-                                                skipQuestion()
-                                            }
-                                            .font(AppConstants.Fonts.medium(16))
-                                            .foregroundColor(Color(hex: "086B52").opacity(0.6))
-                                        }
-                                    }
-                                    .padding(.horizontal, 20)
-                                    .padding(.top, 20)
                                 }
                             }
-                            .padding(.bottom, 40)
+                            .padding(.bottom, 8)
+                        }
+                        
+                        // 提交按钮固定在底部，始终可见
+                        if let question = gameService.currentGame?.currentQuestion {
+                            VStack(spacing: 10) {
+                                Button(action: submitAnswer) {
+                                    Text(showingResult ? "下一题" : "提交答案")
+                                        .font(AppConstants.Fonts.bold(16))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(selectedAnswer == nil && !showingResult ? Color(hex: "086B52").opacity(0.4) : Color(hex: "086B52"))
+                                        )
+                                }
+                                .disabled(selectedAnswer == nil && !showingResult)
+                                
+                                if !showingResult {
+                                    Button("跳过此题") {
+                                        skipQuestion()
+                                    }
+                                    .font(AppConstants.Fonts.medium(14))
+                                    .foregroundColor(Color(hex: "086B52").opacity(0.6))
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 10)
+                            .padding(.bottom, 16)
+                            .background(Color(hex: "F5F7F9"))
+                            // 使用 question.id 触发刷新，避免编译器警告
+                            .id(question.id)
                         }
                     }
                 }

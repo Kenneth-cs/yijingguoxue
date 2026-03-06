@@ -44,40 +44,24 @@ struct QuizView: View {
                         gameHeader(game: game)
                         
                         ScrollView {
-                            VStack(spacing: 24) {
+                            VStack(spacing: 16) {
                                 if let question = game.currentQuestion {
-                                    // Question Card
-                                    VStack(alignment: .leading, spacing: 20) {
-                                        // Tag
+                                    // Question Card（缩小内边距，让内容更紧凑）
+                                    VStack(alignment: .leading, spacing: 12) {
                                         Text("单选题")
                                             .font(AppConstants.Fonts.medium(14))
                                             .foregroundColor(Color(hex: "086B52").opacity(0.6))
                                             .tracking(1.4)
                                         
-                                        // Content
-                                        VStack(alignment: .center, spacing: 24) {
-                                            if !question.content.isEmpty && question.content.contains("¦") {
-                                                 // If content is a symbol (though usually quiz is text based based on prompts)
-                                                // For quiz, content might be symbol but prompt is text.
-                                                // Check GameService: quiz prompt is text like "大壮：利贞", content is symbol.
-                                                Text(question.prompt)
-                                                    .font(AppConstants.Fonts.bold(24))
-                                                    .foregroundColor(Color(hex: "1F2937"))
-                                                    .multilineTextAlignment(.center)
-                                                    .lineSpacing(10)
-                                            } else {
-                                                // Prompt is the main question
-                                                Text(question.prompt)
-                                                    .font(AppConstants.Fonts.bold(24))
-                                                    .foregroundColor(Color(hex: "1F2937"))
-                                                    .multilineTextAlignment(.center)
-                                                    .lineSpacing(10)
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 20)
+                                        Text(question.prompt)
+                                            .font(AppConstants.Fonts.bold(20))
+                                            .foregroundColor(Color(hex: "1F2937"))
+                                            .multilineTextAlignment(.center)
+                                            .lineSpacing(8)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 10)
                                     }
-                                    .padding(24)
+                                    .padding(20)
                                     .background(Color(hex: "086B52").opacity(0.05))
                                     .cornerRadius(12)
                                     .overlay(
@@ -85,10 +69,10 @@ struct QuizView: View {
                                             .stroke(Color(hex: "086B52").opacity(0.05), lineWidth: 1)
                                     )
                                     .padding(.horizontal, 20)
-                                    .padding(.top, 20)
+                                    .padding(.top, 16)
                                     
-                                    // Options
-                                    VStack(spacing: 16) {
+                                    // Options（间距从16缩小到12）
+                                    VStack(spacing: 12) {
                                         ForEach(question.options, id: \.self) { option in
                                             QuizOptionRow(
                                                 text: option,
@@ -104,53 +88,40 @@ struct QuizView: View {
                                         }
                                     }
                                     .padding(.horizontal, 20)
-                                    
-                                    // Navigation Buttons
-                                    HStack(spacing: 16) {
-//                                        Button(action: {
-//                                            // Previous question logic not supported by GameService yet easily without index manipulation
-//                                            // Skip for now as per design "Previous" might just be visual in some flows or needs service update
-//                                            // The reference UI shows "Previous", but GameService moves forward.
-//                                            // We will implement "Submit/Next" logic mainly.
-//                                        }) {
-//                                            Text("上一题")
-//                                                .font(AppConstants.Fonts.bold(16))
-//                                                .foregroundColor(Color(hex: "086B52"))
-//                                                .frame(maxWidth: .infinity)
-//                                                .frame(height: 56)
-//                                                .overlay(
-//                                                    RoundedRectangle(cornerRadius: 12)
-//                                                        .stroke(Color(hex: "086B52"), lineWidth: 1)
-//                                                )
-//                                        }
-                                        
-                                        Button(action: submitAnswer) {
-                                            Text(showingResult ? "下一题" : "提交答案")
-                                                .font(AppConstants.Fonts.bold(16))
-                                                .foregroundColor(.white)
-                                                .frame(maxWidth: .infinity)
-                                                .frame(height: 56)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .fill(selectedAnswer == nil && !showingResult ? Color.gray : Color(hex: "086B52"))
-                                                )
-                                        }
-                                        .disabled(selectedAnswer == nil && !showingResult)
-                                    }
-                                    .padding(.horizontal, 20)
-                                    .padding(.top, 20)
-                                    
-                                    if !showingResult {
-                                        Button("跳过此题") {
-                                            skipQuestion()
-                                        }
-                                        .font(AppConstants.Fonts.medium(16))
-                                        .foregroundColor(Color(hex: "086B52").opacity(0.6))
-                                        .padding(.bottom, 30)
-                                    }
                                 }
                             }
-                            .padding(.bottom, 40)
+                            .padding(.bottom, 8)
+                        }
+                        
+                        // 提交按钮固定在底部，始终可见
+                        if let question = gameService.currentGame?.currentQuestion {
+                            VStack(spacing: 10) {
+                                Button(action: submitAnswer) {
+                                    Text(showingResult ? "下一题" : "提交答案")
+                                        .font(AppConstants.Fonts.bold(16))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(selectedAnswer == nil && !showingResult ? Color.gray : Color(hex: "086B52"))
+                                        )
+                                }
+                                .disabled(selectedAnswer == nil && !showingResult)
+                                
+                                if !showingResult {
+                                    Button("跳过此题") {
+                                        skipQuestion()
+                                    }
+                                    .font(AppConstants.Fonts.medium(14))
+                                    .foregroundColor(Color(hex: "086B52").opacity(0.6))
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 10)
+                            .padding(.bottom, 16)
+                            .background(Color(hex: "F5F7F9"))
+                            .id(question.id)
                         }
                     }
                 }
@@ -215,27 +186,23 @@ struct QuizView: View {
             
             // Stats Row
             HStack(spacing: 0) {
-                // Progress
-                HStack(alignment: .lastTextBaseline, spacing: 2) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("当前进度")
-                            .font(AppConstants.Fonts.medium(12))
-                            .foregroundColor(Color(hex: "086B52").opacity(0.7))
-                        
-                        HStack(alignment: .lastTextBaseline, spacing: 2) {
-                            Text(String(format: "%02d", game.currentQuestionIndex + 1))
-                                .font(AppConstants.Fonts.bold(24))
-                                .foregroundColor(Color(hex: "086B52"))
-                            Text("/ \(game.questions.count)")
-                                .font(AppConstants.Fonts.regular(14))
-                                .foregroundColor(Color(hex: "94A3B8"))
-                        }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("当前进度")
+                        .font(AppConstants.Fonts.medium(12))
+                        .foregroundColor(Color(hex: "086B52").opacity(0.7))
+                    
+                    HStack(alignment: .lastTextBaseline, spacing: 2) {
+                        Text(String(format: "%02d", game.currentQuestionIndex + 1))
+                            .font(AppConstants.Fonts.bold(24))
+                            .foregroundColor(Color(hex: "086B52"))
+                        Text("/ \(game.questions.count)")
+                            .font(AppConstants.Fonts.regular(14))
+                            .foregroundColor(Color(hex: "94A3B8"))
                     }
                 }
                 
                 Spacer()
                 
-                // Score
                 VStack(alignment: .leading, spacing: 4) {
                     Text("当前得分")
                         .font(AppConstants.Fonts.medium(12))
@@ -263,7 +230,7 @@ struct QuizView: View {
             }
             .frame(height: 8)
             .padding(.horizontal, 24)
-            .padding(.bottom, 16)
+            .padding(.bottom, 12)
         }
         .background(Color.white)
     }
@@ -318,7 +285,7 @@ struct QuizOptionRow: View {
                     Circle()
                         .stroke(borderColor, lineWidth: 1)
                         .frame(width: 24, height: 24)
-                        .background(Circle().fill(isSelected || isCorrect || isWrong ? borderColor : Color.clear))
+                        .background(Circle().fill(isSelected || (showResult && (isCorrect || isWrong)) ? borderColor : Color.clear))
                     
                     if showResult {
                         if isCorrect {
@@ -345,7 +312,7 @@ struct QuizOptionRow: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 18)
+            .padding(.vertical, 14)
             .background(backgroundColor)
             .cornerRadius(12)
             .overlay(

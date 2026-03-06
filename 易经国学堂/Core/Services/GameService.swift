@@ -110,6 +110,8 @@ class GameService: ObservableObject {
     /// 开始知识问答游戏
     private func startQuizGame(questionCount: Int) {
         let hexagrams = dataService.getRandomHexagrams(count: questionCount)
+        let otherHexagrams = dataService.hexagrams // 全量用于生成干扰项
+        
         let questions = hexagrams.map { hexagram -> Question in
             let questionTypes = ["卦名", "卦辞", "组成"]
             let selectedType = questionTypes.randomElement()!
@@ -118,25 +120,43 @@ class GameService: ObservableObject {
             var correctAnswer = ""
             var options: [String] = []
             
+            let others = otherHexagrams.filter { $0.id != hexagram.id }.shuffled()
+            
             switch selectedType {
             case "卦名":
-                prompt = "「\(hexagram.description.prefix(10))…」这是哪一卦的卦辞？"
-                correctAnswer = hexagram.name
-                var opts = [hexagram.name]
-                opts.append(contentsOf: dataService.hexagrams.filter { $0.id != hexagram.id }.shuffled().prefix(3).map { $0.name })
+                // 看卦辞猜卦名，4个选项
+                prompt = "「\(hexagram.description.prefix(8))…」是哪一卦的卦辞？"
+                correctAnswer = hexagram.chineseName
+                var opts = [hexagram.chineseName]
+                opts.append(contentsOf: others.prefix(3).map { $0.chineseName })
                 options = opts.shuffled()
                 
             case "卦辞":
+                // 看卦名猜卦辞（取第一句），4个选项
                 prompt = "\(hexagram.chineseName)的卦辞是？"
-                correctAnswer = hexagram.description
-                // 简化版：只用第一句作为选项
-                let mainText = String(hexagram.description.split(separator: "。").first ?? "")
-                options = [mainText]
+                let correct = String(hexagram.description.split(separator: "。").first ?? Substring(hexagram.description))
+                correctAnswer = correct
+                var opts = [correct]
+                // 从其他卦取卦辞第一句作为干扰项
+                let wrongs = others.prefix(3).compactMap { h -> String? in
+                    let s = String(h.description.split(separator: "。").first ?? Substring(h.description))
+                    return s.isEmpty ? nil : s
+                }
+                opts.append(contentsOf: wrongs)
+                options = opts.shuffled()
                 
             case "组成":
-                prompt = "\(hexagram.chineseName)由哪两个八卦组成？"
+                // 看卦名猜八卦组成，4个选项
+                prompt = "\(hexagram.chineseName)由哪两个经卦组成？"
                 correctAnswer = hexagram.trigramDescription
-                options = [hexagram.trigramDescription]
+                var opts = [hexagram.trigramDescription]
+                // 从其他卦取组成描述作为干扰项，去重
+                let wrongs = others
+                    .map { $0.trigramDescription }
+                    .filter { $0 != hexagram.trigramDescription }
+                    .prefix(3)
+                opts.append(contentsOf: wrongs)
+                options = opts.shuffled()
                 
             default:
                 break
@@ -144,7 +164,7 @@ class GameService: ObservableObject {
             
             return Question(
                 id: UUID(),
-                type: options.count > 1 ? .multipleChoice : .text,
+                type: .multipleChoice, // 始终4选1
                 prompt: prompt,
                 content: hexagram.symbol,
                 correctAnswer: correctAnswer,

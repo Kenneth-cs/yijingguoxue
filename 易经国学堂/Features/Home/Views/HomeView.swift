@@ -54,7 +54,7 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("易经学院")
+                    Text("易经国学堂")
                         .font(ST(20, .bold))
                         .foregroundColor(themeGreen)
                 }
@@ -70,77 +70,65 @@ struct HomeView: View {
 // MARK: - 欢迎横幅
 extension HomeView {
     private var welcomeBanner: some View {
-        ZStack(alignment: .leading) {
-            // 深绿渐变背景
+        ZStack {
+            // 背景图片
+            Image("HomeBanner")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 148)
+                .clipped()
+                .cornerRadius(16)
+
+            // 深色遮罩，让文字清晰可读
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.04, green: 0.47, blue: 0.36),
-                            Color(red: 0.02, green: 0.28, blue: 0.22)
+                            Color.black.opacity(0.52),
+                            Color.black.opacity(0.28),
+                            Color.black.opacity(0.08)
                         ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                        startPoint: .leading,
+                        endPoint: .trailing
                     )
                 )
 
-            // 右侧装饰圆圈（层叠半透明）
-            HStack {
-                Spacer()
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.07))
-                        .frame(width: 110, height: 110)
-                        .offset(x: 30, y: -18)
-                    Circle()
-                        .fill(Color.white.opacity(0.05))
-                        .frame(width: 75, height: 75)
-                        .offset(x: -5, y: 20)
-                    Circle()
-                        .fill(Color.white.opacity(0.04))
-                        .frame(width: 50, height: 50)
-                        .offset(x: 40, y: 22)
-                }
-                .padding(.trailing, -10)
-            }
-
-            // 左侧内容
+            // 内容：上下左右居中
             HStack(spacing: 14) {
-                // 太极图标圆形背景
+                // 太极图标
                 ZStack {
                     Circle()
-                        .fill(Color.white.opacity(0.18))
-                        .frame(width: 50, height: 50)
+                        .fill(Color.white.opacity(0.22))
+                        .frame(width: 48, height: 48)
                     Text("☯")
-                        .font(ST(26))
+                        .font(ST(24))
                         .foregroundColor(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("欢迎学习易经")
-                        .font(ST(18, .bold))
+                        .font(ST(20, .bold))
                         .foregroundColor(.white)
 
                     Text("探索中华传统文化，领悟天地之道")
                         .font(ST(13))
-                        .foregroundColor(.white.opacity(0.80))
+                        .foregroundColor(.white.opacity(0.88))
 
                     // 金色下划线装饰
                     RoundedRectangle(cornerRadius: 2)
                         .fill(Color(red: 0.95, green: 0.78, blue: 0.25))
                         .frame(width: 44, height: 2.5)
-                        .padding(.top, 2)
+                        .padding(.top, 1)
                 }
                 Spacer()
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 20)
         }
-        .frame(height: 108)
+        .frame(height: 148)
     }
 }
 
-// MARK: - 今日一卦卡片
+// MARK: - 每日一卦卡片
 extension HomeView {
     private var dailyHexagramCard: some View {
         Group {
@@ -160,38 +148,37 @@ extension HomeView {
         VStack(alignment: .leading, spacing: 0) {
 
             // ── 顶部：标签 + 六爻图标 ──────────────────
-            HStack(alignment: .center) {
-                Text("今日一卦")
-                    .font(ST(14, .semibold))
+            HStack(alignment: .top) {
+                Text("每日一卦")
+                    .font(ST(13, .semibold))
                     .foregroundColor(themeGreen)
                 Spacer()
-                hexagramMenuIcon
+                hexagramSymbolIcon(hexagram: hexagram)
             }
-            .padding(.bottom, 12)
+            .padding(.bottom, 6)
 
             // ── 卦名 ──────────────────────────────────
             Text(hexagram.map { "第\($0.id)卦 \($0.chineseName)" } ?? "加载中…")
-                .font(ST(22, .bold))
+                .font(ST(20, .bold))
                 .foregroundColor(textDark)
-                .padding(.bottom, 10)
+                .padding(.bottom, 6)
 
-            // ── 卦辞（使用新 summary 字段，两边加引号）──────────────────
-            Text(hexagram.map { hexagram in "\u{201C}\(hexagram.summary)\u{201D}" } ?? "")
-                .font(ST(14))
+            // ── 卦辞（summary 字段，两边加引号）──────────────────
+            Text(hexagram.map { h in "\u{201C}\(h.summary)\u{201D}" } ?? "")
+                .font(ST(13))
                 .foregroundColor(textMid)
-                .lineSpacing(5)
+                .lineSpacing(4)
                 .lineLimit(3)
-                .padding(.bottom, 16)
+                .padding(.bottom, 12)
 
             // ── 分隔线 ────────────────────────────────
             Rectangle()
                 .fill(themeGreen.opacity(0.06))
                 .frame(height: 1)
-                .padding(.bottom, 12)
+                .padding(.bottom, 10)
 
-            // ── 底部：卦卦位（使用新 structure 字段） + 查看详情 ──────────────
+            // ── 底部：结构 + 查看详情 ──────────────
             HStack {
-                // 使用 structure 字段（如 "上离下艮"）并添加 · 卦名
                 Text(hexagram.map { "\($0.structure) · \($0.name)卦" } ?? "")
                     .font(ST(12))
                     .foregroundColor(textLight)
@@ -199,47 +186,54 @@ extension HomeView {
                 Spacer()
 
                 Text("查看详情")
-                    .font(ST(14, .medium))
+                    .font(ST(13, .medium))
                     .foregroundColor(.white)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 9)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                     .background(themeGreen)
                     .cornerRadius(8)
             }
         }
-        .padding(18)
+        .padding(16)
         .background(Color.white)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(themeGreen.opacity(0.06), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.10), radius: 6, x: 0, y: 4)
+        .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
     }
 
-    /// 右上角六爻样式图标
-    private var hexagramMenuIcon: some View {
-        VStack(spacing: 5) {
-            // 模拟六爻：实线 / 断线 / 实线 共 3 组
-            ForEach(0..<3) { i in
-                if i == 2 {
-                    // 第三行：断线（阴爻样式）
-                    HStack(spacing: 4) {
-                        RoundedRectangle(cornerRadius: 9)
-                            .fill(themeGreen.opacity(0.25))
-                            .frame(width: 11, height: 3.5)
-                        RoundedRectangle(cornerRadius: 9)
-                            .fill(themeGreen.opacity(0.25))
-                            .frame(width: 11, height: 3.5)
-                    }
-                } else {
-                    RoundedRectangle(cornerRadius: 9)
+    /// 右上角六爻图标：根据卦象 binary 字符串绘制真实阴阳爻（从上到下第6→1爻）
+    private func hexagramSymbolIcon(hexagram: Hexagram?) -> some View {
+        let lineWidth: CGFloat = 28
+        let lineHeight: CGFloat = 3
+        let gap: CGFloat = 3
+        let spacing: CGFloat = 4
+
+        // binary index 0 = 上爻（第6爻），直接从上到下展示，无需反转
+        let bits: [Character] = hexagram.map { Array($0.binary) } ?? Array(repeating: "1", count: 6)
+
+        return VStack(spacing: spacing) {
+            ForEach(0..<6) { i in
+                let isYang = i < bits.count ? bits[i] == "1" : true
+                if isYang {
+                    RoundedRectangle(cornerRadius: 1.5)
                         .fill(themeGreen)
-                        .frame(width: 26, height: 3.5)
+                        .frame(width: lineWidth, height: lineHeight)
+                } else {
+                    HStack(spacing: gap) {
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(themeGreen.opacity(0.45))
+                            .frame(width: (lineWidth - gap) / 2, height: lineHeight)
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(themeGreen.opacity(0.45))
+                            .frame(width: (lineWidth - gap) / 2, height: lineHeight)
+                    }
                 }
             }
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .background(themeGreen.opacity(0.06))
         .cornerRadius(8)

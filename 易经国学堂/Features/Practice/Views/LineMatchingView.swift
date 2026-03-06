@@ -45,50 +45,48 @@ struct LineMatchingView: View {
                         gameHeader(game: game)
                         
                         ScrollView {
-                            VStack(spacing: 24) {
+                            VStack(spacing: 16) {
                                 if let question = game.currentQuestion,
                                    let hexagram = dataService.getHexagram(by: question.hexagramId) {
                                     
-                                    // Main Card
+                                    // Main Card（缩小内边距）
                                     VStack(spacing: 0) {
-                                        // Hexagram Symbol with Highlight
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 12)
                                                 .fill(Color(hex: "086B52").opacity(0.1))
-                                                .frame(width: 132, height: 24)
+                                                .frame(width: 140, height: 24)
                                             
                                             Text("当前卦象: \(hexagram.chineseName)")
                                                 .font(AppConstants.Fonts.bold(12))
                                                 .foregroundColor(Color(hex: "086B52"))
                                         }
-                                        .padding(.top, 20)
+                                        .padding(.top, 16)
                                         
-                                        // Symbol
+                                        // Symbol（缩小size从100到80）
                                         HexagramSymbolView(
                                             hexagram: hexagram,
-                                            size: 100,
+                                            size: 80,
                                             color: Color(hex: "086B52"),
                                             highlightPosition: question.linePosition,
-                                            highlightColor: Color(hex: "F59E0B") // Highlight with Amber/Orange
+                                            highlightColor: Color(hex: "F59E0B")
                                         )
-                                        .padding(.vertical, 20)
+                                        .padding(.vertical, 14)
                                         
-                                        // Question Text
                                         Text("\(hexagram.chineseName) 的第 \(question.linePosition ?? 0) 爻爻辞是？")
-                                            .font(AppConstants.Fonts.bold(20))
+                                            .font(AppConstants.Fonts.bold(18))
                                             .foregroundColor(Color(hex: "086B52"))
                                             .multilineTextAlignment(.center)
-                                            .padding(.bottom, 30)
+                                            .padding(.bottom, 16)
                                             .padding(.horizontal, 20)
                                     }
                                     .background(Color.white)
                                     .cornerRadius(12)
                                     .shadow(color: Color(hex: "086B52").opacity(0.05), radius: 10, y: 8)
                                     .padding(.horizontal, 20)
-                                    .padding(.top, 20)
+                                    .padding(.top, 16)
                                     
-                                    // Options List
-                                    VStack(spacing: 16) {
+                                    // Options List（间距从16缩小到12）
+                                    VStack(spacing: 12) {
                                         ForEach(Array(question.options.enumerated()), id: \.element) { index, option in
                                             let optionLabel = ["A", "B", "C", "D"][index % 4]
                                             LineOptionRow(
@@ -106,34 +104,40 @@ struct LineMatchingView: View {
                                         }
                                     }
                                     .padding(.horizontal, 20)
-                                    
-                                    // Action Buttons
-                                    VStack(spacing: 16) {
-                                        Button(action: submitAnswer) {
-                                            Text(showingResult ? "下一题" : "提交答案")
-                                                .font(AppConstants.Fonts.bold(18))
-                                                .foregroundColor(.white)
-                                                .frame(maxWidth: .infinity)
-                                                .frame(height: 56)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .fill(selectedAnswer == nil && !showingResult ? Color.gray : Color(hex: "086B52"))
-                                                )
-                                        }
-                                        .disabled(selectedAnswer == nil && !showingResult)
-                                        
-                                        if !showingResult {
-                                            Button("跳过此题") {
-                                                skipQuestion()
-                                            }
-                                            .font(AppConstants.Fonts.medium(14))
-                                            .foregroundColor(Color(hex: "086B52"))
-                                        }
-                                    }
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 30)
                                 }
                             }
+                            .padding(.bottom, 8)
+                        }
+                        
+                        // 提交按钮固定在底部，始终可见
+                        if let question = gameService.currentGame?.currentQuestion {
+                            VStack(spacing: 10) {
+                                Button(action: submitAnswer) {
+                                    Text(showingResult ? "下一题" : "提交答案")
+                                        .font(AppConstants.Fonts.bold(16))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(selectedAnswer == nil && !showingResult ? Color.gray : Color(hex: "086B52"))
+                                        )
+                                }
+                                .disabled(selectedAnswer == nil && !showingResult)
+                                
+                                if !showingResult {
+                                    Button("跳过此题") {
+                                        skipQuestion()
+                                    }
+                                    .font(AppConstants.Fonts.medium(14))
+                                    .foregroundColor(Color(hex: "086B52").opacity(0.6))
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 10)
+                            .padding(.bottom, 16)
+                            .background(Color(hex: "F5F7F9"))
+                            .id(question.id)
                         }
                     }
                 }
