@@ -15,18 +15,18 @@ struct MainTabView: View {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         
-        // 使用米白色背景
-        appearance.backgroundColor = UIColor(red: 0.97, green: 0.96, blue: 0.94, alpha: 1.0) // #F7F5F0
+        // TabBar 背景色（白色，与卡片一致）
+        appearance.backgroundColor = UIColor.white
         
-        // 设置选中状态的颜色 - 使用朱砂红
-        let selectedColor = UIColor(red: 0.75, green: 0.28, blue: 0.32, alpha: 1.0) // #C04851
+        // 选中状态 - 深绿色
+        let selectedColor = UIColor(red: 0.106, green: 0.369, blue: 0.310, alpha: 1.0) // #1B5E4F
         appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
             .foregroundColor: selectedColor,
             .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
         ]
         
-        // 设置未选中状态的颜色 - 使用淡墨色
+        // 未选中状态 - 中灰色
         let normalColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) // #999999
         appearance.stackedLayoutAppearance.normal.iconColor = normalColor
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
@@ -34,12 +34,14 @@ struct MainTabView: View {
             .font: UIFont.systemFont(ofSize: 10, weight: .regular)
         ]
         
+        // 顶部分隔线（极淡）
+        appearance.shadowColor = UIColor(white: 0, alpha: 0.08)
+        
         UITabBar.appearance().standardAppearance = appearance
         if #available(iOS 15.0, *) {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
         
-        // 设置全局的tintColor
         UITabBar.appearance().tintColor = selectedColor
         UITabBar.appearance().unselectedItemTintColor = normalColor
     }
@@ -49,7 +51,7 @@ struct MainTabView: View {
             // 首页
             HomeView()
                 .tabItem {
-                    Label("首页", systemImage: "house.fill")
+                    Label("首页", systemImage: selectedTab == 0 ? "house.fill" : "house")
                 }
                 .tag(0)
             
@@ -59,21 +61,21 @@ struct MainTabView: View {
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
-                Label("百科", systemImage: "book.fill")
+                Label("百科", systemImage: selectedTab == 1 ? "books.vertical.fill" : "books.vertical")
             }
             .tag(1)
             
             // 练习
             PracticeView()
                 .tabItem {
-                    Label("练习", systemImage: "gamecontroller.fill")
+                    Label("练习", systemImage: selectedTab == 2 ? "graduationcap.fill" : "graduationcap")
                 }
                 .tag(2)
             
             // 我的
             ProfileView()
                 .tabItem {
-                    Label("我的", systemImage: "person.fill")
+                    Label("我的", systemImage: selectedTab == 3 ? "person.fill" : "person")
                 }
                 .tag(3)
         }
