@@ -175,8 +175,8 @@ extension HomeView {
                 .foregroundColor(textDark)
                 .padding(.bottom, 10)
 
-            // ── 卦辞（最多展示 2 行）──────────────────
-            Text(hexagram.map { hexagram in "\u{201C}\(hexagram.description)\u{201D}" } ?? "")
+            // ── 卦辞（使用新 summary 字段，两边加引号）──────────────────
+            Text(hexagram.map { hexagram in "\u{201C}\(hexagram.summary)\u{201D}" } ?? "")
                 .font(ST(14))
                 .foregroundColor(textMid)
                 .lineSpacing(5)
@@ -189,9 +189,10 @@ extension HomeView {
                 .frame(height: 1)
                 .padding(.bottom, 12)
 
-            // ── 底部：卦卦位 + 查看详情 ──────────────
+            // ── 底部：卦卦位（使用新 structure 字段） + 查看详情 ──────────────
             HStack {
-                Text(hexagram.map { "\($0.lowerTrigram)下\($0.upperTrigram)上 · \($0.name)卦" } ?? "")
+                // 使用 structure 字段（如 "上离下艮"）并添加 · 卦名
+                Text(hexagram.map { "\($0.structure) · \($0.name)卦" } ?? "")
                     .font(ST(12))
                     .foregroundColor(textLight)
 
