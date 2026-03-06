@@ -111,29 +111,45 @@ enum AppConstants {
         )
     }
     
-    // MARK: - 字体系统
+    // MARK: - 字体系统（全局使用宋体 Songti SC）
     enum Fonts {
-        // 标题字体 - 使用宋体（衬线体）
+        // 宋体名称常量，iOS 系统内置
+        private static let songtiName = "Songti SC"
+
+        // 宋体标题（用于卦名、章节标题等需要古典气质的地方）
         static func serifTitle(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
-            return .system(size: size, weight: weight, design: .serif)
+            let uiWeight: UIFont.Weight
+            switch weight {
+            case .bold:     uiWeight = .bold
+            case .semibold: uiWeight = .semibold
+            case .medium:   uiWeight = .medium
+            case .light:    uiWeight = .light
+            default:        uiWeight = .regular
+            }
+            // 通过 UIFont 确保正确加载宋体，再桥接到 SwiftUI Font
+            let descriptor = UIFontDescriptor(name: songtiName, size: size)
+            let uiFont = UIFont(descriptor: descriptor.addingAttributes([
+                .traits: [UIFontDescriptor.TraitKey.weight: uiWeight]
+            ]), size: size)
+            return Font(uiFont)
         }
-        
-        // 正文字体 - 黑体（无衬线体）
+
+        // 宋体正文（用于卦辞、解读等内容文字）
         static func body(size: CGFloat, weight: Font.Weight = .regular) -> Font {
-            return .system(size: size, weight: weight)
+            return serifTitle(size: size, weight: weight)
         }
-        
+
         // 预定义尺寸
-        static let largeTitle = serifTitle(size: 32, weight: .bold)
-        static let title1 = serifTitle(size: 24, weight: .semibold)
-        static let title2 = serifTitle(size: 20, weight: .semibold)
-        static let title3 = serifTitle(size: 18, weight: .semibold)
-        static let headline = body(size: 17, weight: .semibold)
-        static let bodyText = body(size: 16, weight: .regular)
-        static let callout = body(size: 15, weight: .regular)
-        static let subheadline = body(size: 14, weight: .regular)
-        static let caption = body(size: 13, weight: .regular)
-        static let caption2 = body(size: 12, weight: .regular)
+        static let largeTitle  = serifTitle(size: 32, weight: .bold)
+        static let title1      = serifTitle(size: 24, weight: .semibold)
+        static let title2      = serifTitle(size: 20, weight: .semibold)
+        static let title3      = serifTitle(size: 18, weight: .semibold)
+        static let headline    = serifTitle(size: 17, weight: .semibold)
+        static let bodyText    = serifTitle(size: 16, weight: .regular)
+        static let callout     = serifTitle(size: 15, weight: .regular)
+        static let subheadline = serifTitle(size: 14, weight: .regular)
+        static let caption     = serifTitle(size: 13, weight: .regular)
+        static let caption2    = serifTitle(size: 12, weight: .regular)
     }
 }
 

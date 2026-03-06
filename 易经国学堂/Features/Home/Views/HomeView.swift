@@ -15,6 +15,11 @@ private let textMid       = Color(red: 0.28, green: 0.33, blue: 0.41)
 private let textLight     = Color(red: 0.58, green: 0.64, blue: 0.72)
 private let textLabel     = Color(red: 0.39, green: 0.45, blue: 0.55)
 
+/// 全局宋体字体帮助函数（首页内所有文字统一使用 Songti SC）
+private func ST(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
+    Font.custom("Songti SC", size: size).weight(weight)
+}
+
 struct HomeView: View {
     @EnvironmentObject var dataService: DataService
     @EnvironmentObject var storageService: StorageService
@@ -40,7 +45,7 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("易经学院")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(ST(20, .bold))
                         .foregroundColor(themeGreen)
                 }
             }
@@ -97,17 +102,17 @@ extension HomeView {
                         .fill(Color.white.opacity(0.18))
                         .frame(width: 50, height: 50)
                     Text("☯")
-                        .font(.system(size: 26))
+                        .font(ST(26))
                         .foregroundColor(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("欢迎学习易经")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(ST(18, .bold))
                         .foregroundColor(.white)
 
                     Text("探索中华传统文化，领悟天地之道")
-                        .font(.system(size: 13))
+                        .font(ST(13))
                         .foregroundColor(.white.opacity(0.80))
 
                     // 金色下划线装饰
@@ -147,7 +152,7 @@ extension HomeView {
             // ── 顶部：标签 + 六爻图标 ──────────────────
             HStack(alignment: .center) {
                 Text("今日一卦")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(ST(14, .semibold))
                     .foregroundColor(themeGreen)
                 Spacer()
                 hexagramMenuIcon
@@ -156,13 +161,13 @@ extension HomeView {
 
             // ── 卦名 ──────────────────────────────────
             Text(hexagram.map { "第\($0.id)卦 \($0.chineseName)" } ?? "加载中…")
-                .font(.system(size: 22, weight: .bold))
+                .font(ST(22, .bold))
                 .foregroundColor(textDark)
                 .padding(.bottom, 10)
 
             // ── 卦辞（最多展示 2 行）──────────────────
             Text(hexagram.map { hexagram in "\u{201C}\(hexagram.description)\u{201D}" } ?? "")
-                .font(.system(size: 14))
+                .font(ST(14))
                 .foregroundColor(textMid)
                 .lineSpacing(5)
                 .lineLimit(3)
@@ -177,13 +182,13 @@ extension HomeView {
             // ── 底部：卦卦位 + 查看详情 ──────────────
             HStack {
                 Text(hexagram.map { "\($0.lowerTrigram)下\($0.upperTrigram)上 · \($0.name)卦" } ?? "")
-                    .font(.system(size: 12))
+                    .font(ST(12))
                     .foregroundColor(textLight)
 
                 Spacer()
 
                 Text("查看详情")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(ST(14, .medium))
                     .foregroundColor(.white)
                     .padding(.horizontal, 18)
                     .padding(.vertical, 9)
@@ -290,12 +295,12 @@ extension HomeView {
                     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
 
                 Image(systemName: icon)
-                    .font(.system(size: 20, weight: .medium))
+                    .font(ST(20, .medium))
                     .foregroundColor(themeGreen)
             }
 
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .font(ST(12, .medium))
                 .foregroundColor(textDark)
         }
         .frame(maxWidth: .infinity)
@@ -307,7 +312,7 @@ extension HomeView {
     private var learningOverviewSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("学习概览")
-                .font(.system(size: 18, weight: .bold))
+                .font(ST(18, .bold))
                 .foregroundColor(textDark)
 
             HStack(spacing: 10) {
@@ -327,20 +332,20 @@ extension HomeView {
             // 小图标 + 标签
             HStack(spacing: 4) {
                 Image(systemName: "book")
-                    .font(.system(size: 11))
+                    .font(ST(11))
                     .foregroundColor(textLabel)
                 Text("已学卦象")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(ST(12, .medium))
                     .foregroundColor(textLabel)
             }
 
             // 数值
             HStack(alignment: .bottom, spacing: 2) {
                 Text("\(learned)")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(ST(24, .bold))
                     .foregroundColor(themeGreen)
                 Text("/ 64")
-                    .font(.system(size: 13))
+                    .font(ST(13))
                     .foregroundColor(textLight)
                     .padding(.bottom, 2)
             }
@@ -371,19 +376,19 @@ extension HomeView {
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 4) {
                 Image(systemName: "bookmark")
-                    .font(.system(size: 11))
+                    .font(ST(11))
                     .foregroundColor(textLabel)
                 Text("我的收藏")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(ST(12, .medium))
                     .foregroundColor(textLabel)
             }
 
             Text("\(count)")
-                .font(.system(size: 24, weight: .bold))
+                .font(ST(24, .bold))
                 .foregroundColor(themeGreen)
 
             Text(count == 0 ? "暂无收藏" : "共\(count)卦")
-                .font(.system(size: 10))
+                .font(ST(10))
                 .foregroundColor(textLight)
         }
         .padding(.horizontal, 12)
@@ -399,25 +404,25 @@ extension HomeView {
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 4) {
                 Image(systemName: "flame")
-                    .font(.system(size: 11))
+                    .font(ST(11))
                     .foregroundColor(textLabel)
                 Text("连续学习")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(ST(12, .medium))
                     .foregroundColor(textLabel)
             }
 
             HStack(alignment: .bottom, spacing: 2) {
                 Text("\(days)")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(ST(24, .bold))
                     .foregroundColor(themeGreen)
                 Text("天")
-                    .font(.system(size: 13))
+                    .font(ST(13))
                     .foregroundColor(textLight)
                     .padding(.bottom, 2)
             }
 
             Text("打败了 12% 用户")
-                .font(.system(size: 10))
+                .font(ST(10))
                 .foregroundColor(textLight)
         }
         .padding(.horizontal, 12)
