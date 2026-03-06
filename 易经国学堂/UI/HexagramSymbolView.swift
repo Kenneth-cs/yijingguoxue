@@ -11,17 +11,19 @@ import SwiftUI
 struct HexagramSymbolView: View {
     let hexagram: Hexagram
     let size: CGFloat
+    let color: Color
     
-    init(hexagram: Hexagram, size: CGFloat = 120) {
+    init(hexagram: Hexagram, size: CGFloat = 120, color: Color = .primary) {
         self.hexagram = hexagram
         self.size = size
+        self.color = color
     }
     
     var body: some View {
         VStack(spacing: size * 0.12) {
             // 从上往下显示六爻（position 6 到 1）
             ForEach(hexagram.lines.reversed(), id: \.position) { line in
-                LineSymbol(isYang: line.isYang, width: size)
+                LineSymbol(isYang: line.isYang, width: size, color: color)
             }
         }
         .frame(width: size * 1.3) // 限制整体宽度
@@ -37,6 +39,7 @@ struct HexagramSymbolView: View {
 struct LineSymbol: View {
     let isYang: Bool
     let width: CGFloat
+    let color: Color
     
     // 爻的实际显示宽度和高度
     private var lineWidth: CGFloat { width }
@@ -47,19 +50,19 @@ struct LineSymbol: View {
         if isYang {
             // 阳爻 - 实线
             Rectangle()
-                .fill(Color.primary)
+                .fill(color)
                 .frame(width: lineWidth, height: lineHeight)
                 .cornerRadius(lineHeight * 0.2)
         } else {
             // 阴爻 - 断线（中间有间隔）
             HStack(spacing: gapWidth) {
                 Rectangle()
-                    .fill(Color.primary)
+                    .fill(color)
                     .frame(width: (lineWidth - gapWidth) / 2, height: lineHeight)
                     .cornerRadius(lineHeight * 0.2)
                 
                 Rectangle()
-                    .fill(Color.primary)
+                    .fill(color)
                     .frame(width: (lineWidth - gapWidth) / 2, height: lineHeight)
                     .cornerRadius(lineHeight * 0.2)
             }
@@ -71,17 +74,19 @@ struct LineSymbol: View {
 struct BinaryHexagramView: View {
     let binary: String
     let size: CGFloat
+    let color: Color
     
-    init(binary: String, size: CGFloat = 120) {
+    init(binary: String, size: CGFloat = 120, color: Color = .primary) {
         self.binary = binary
         self.size = size
+        self.color = color
     }
     
     var body: some View {
         VStack(spacing: size * 0.12) {
             // 从上往下遍历二进制字符串（index 0 到 5）
             ForEach(Array(binary.enumerated()), id: \.offset) { index, char in
-                LineSymbol(isYang: char == "1", width: size)
+                LineSymbol(isYang: char == "1", width: size, color: color)
             }
         }
         .frame(width: size * 1.3) // 限制整体宽度
@@ -94,12 +99,12 @@ struct BinaryHexagramView: View {
 }
 
 #Preview("阳爻") {
-    LineSymbol(isYang: true, width: 150)
+    LineSymbol(isYang: true, width: 150, color: .primary)
         .padding()
 }
 
 #Preview("阴爻") {
-    LineSymbol(isYang: false, width: 150)
+    LineSymbol(isYang: false, width: 150, color: .primary)
         .padding()
 }
 

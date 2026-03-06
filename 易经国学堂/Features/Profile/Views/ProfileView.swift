@@ -172,7 +172,7 @@ struct FavoritesView: View {
                     LazyVStack(spacing: 12) {
                         ForEach(favoriteHexagrams) { hexagram in
                             NavigationLink(destination: HexagramDetailView(hexagram: hexagram)) {
-                                HexagramCardView(hexagram: hexagram, isFavorite: true)
+                                HexagramListCell(hexagram: hexagram)
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
