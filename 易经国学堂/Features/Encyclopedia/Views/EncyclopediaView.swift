@@ -12,9 +12,11 @@ struct EncyclopediaView: View {
     @EnvironmentObject var storageService: StorageService
     @State private var searchText = ""
     @State private var selectedSegment: Int
+    let initialSegment: Int
     
     // 添加初始化参数，允许指定默认选中的tab
     init(initialSegment: Int = 0) {
+        self.initialSegment = initialSegment
         _selectedSegment = State(initialValue: initialSegment)
     }
     
@@ -43,10 +45,13 @@ struct EncyclopediaView: View {
                     }
                 }
             }
-            .navigationTitle("易经百科")
-            .searchable(text: $searchText, prompt: "搜索卦象")
         }
-        .navigationViewStyle(StackNavigationViewStyle())
+        .navigationTitle("易经百科")
+        .searchable(text: $searchText, prompt: "搜索卦象")
+        .onAppear {
+            // 确保每次进入页面时都设置正确的segment
+            selectedSegment = initialSegment
+        }
     }
 }
 
