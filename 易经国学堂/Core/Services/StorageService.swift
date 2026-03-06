@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// 存储服务 - 负责本地数据持久化
 class StorageService: ObservableObject {
@@ -88,21 +89,41 @@ class StorageService: ObservableObject {
         saveStudyProgress()
     }
     
-    /// 获取每日一卦ID
+    /// 获取每日一卦ID（基于设备+日期生成稳定的卦象）
     func getDailyHexagramId() -> Int? {
         let calendar = Calendar.current
         
-        // 检查是否需要更新（如果不是今天或没有设置）
+        // 检查缓存：如果是今天且已有卦象，直接返回（提高性能）
         if let lastUpdate = studyProgress.lastDailyUpdate,
            calendar.isDateInToday(lastUpdate),
            let dailyId = studyProgress.dailyHexagramId {
             return dailyId
         }
         
-        // 生成新的每日一卦
-        let newId = Int.random(in: 1...64)
+        // 生成新的每日一卦（基于设备ID + 日期）
+        let newId = generateDailyHexagramId()
         updateDailyHexagram(newId)
         return newId
+    }
+    
+    /// 基于设备UUID和日期生成稳定的卦象ID
+    private func generateDailyHexagramId() -> Int {
+        // 获取设备唯一标识符
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "default-device"
+        
+        // 获取当前日期字符串（格式：yyyyMMdd）
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        let dateString = dateFormatter.string(from: Date())
+        
+        // 组合设备ID和日期
+        let seed = "\(deviceId)-\(dateString)"
+        
+        // 使用哈希值生成1-64之间的卦象ID
+        let hash = seed.hashValue
+        let hexagramId = abs(hash % 64) + 1
+        
+        return hexagramId
     }
     
     /// 增加学习时长

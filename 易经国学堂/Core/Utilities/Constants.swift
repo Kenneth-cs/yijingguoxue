@@ -45,24 +45,59 @@ enum AppConstants {
     
     // MARK: - UI 配置
     enum UI {
-        static let cornerRadius: CGFloat = 12
-        static let cardPadding: CGFloat = 16
-        static let sectionSpacing: CGFloat = 20
-        static let animationDuration: Double = 0.3
+        static let cornerRadius: CGFloat = 16
+        static let cardPadding: CGFloat = 20
+        static let sectionSpacing: CGFloat = 24
+        static let animationDuration: Double = 0.35
+        static let shadowRadius: CGFloat = 8
+        static let shadowOpacity: Double = 0.08
     }
     
-    // MARK: - 颜色配置
+    // MARK: - 颜色配置 (易经主题)
     enum Colors {
-        static let primary = Color("PrimaryColor")
-        static let secondary = Color("SecondaryColor")
-        static let background = Color("BackgroundColor")
-        static let cardBackground = Color("CardBackground")
+        // 主色调 - 墨绿色系（呼应App Icon）
+        static let primary = Color(hex: "1B5E4F")        // 深墨绿
+        static let primaryLight = Color(hex: "2E8B6F")   // 浅墨绿
+        static let primaryDark = Color(hex: "0D3D31")    // 极深绿
         
-        // 传统色彩
-        static let ink = Color(hex: "2C3E50")        // 墨色
-        static let cinnabar = Color(hex: "C73E3A")   // 朱砂
-        static let jade = Color(hex: "2E8B57")       // 玉色
-        static let gold = Color(hex: "D4AF37")       // 金色
+        // 辅助色 - 金色系（呼应App Icon）
+        static let accent = Color(hex: "D4AF37")         // 金色
+        static let accentLight = Color(hex: "E5C766")    // 浅金
+        static let accentDark = Color(hex: "B8941F")     // 深金
+        
+        // 传统文化色彩
+        static let ink = Color(hex: "2C3E50")            // 墨色
+        static let cinnabar = Color(hex: "C73E3A")       // 朱砂红
+        static let jade = Color(hex: "3FA796")           // 玉色
+        static let bamboo = Color(hex: "6B8E23")         // 竹青
+        static let cloud = Color(hex: "E8E8E8")          // 云白
+        
+        // 阴阳色彩
+        static let yang = Color(hex: "FF6B6B")           // 阳爻 - 暖红
+        static let yin = Color(hex: "4ECDC4")            // 阴爻 - 冷青
+        
+        // 背景色
+        static let background = Color(hex: "F5F7F6")     // 淡雅背景
+        static let cardBackground = Color.white
+        
+        // 渐变色组合
+        static let primaryGradient = LinearGradient(
+            colors: [Color(hex: "1B5E4F"), Color(hex: "2E8B6F")],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
+        static let accentGradient = LinearGradient(
+            colors: [Color(hex: "D4AF37"), Color(hex: "E5C766")],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
+        static let elegantGradient = LinearGradient(
+            colors: [Color(hex: "1B5E4F").opacity(0.1), Color(hex: "D4AF37").opacity(0.1)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
     
     // MARK: - 字体大小

@@ -50,9 +50,8 @@ struct HexagramDetailView: View {
     // MARK: - Hexagram Header
     private var hexagramHeader: some View {
         VStack(spacing: 15) {
-            // 卦象符号
-            Text(hexagram.symbol)
-                .font(.system(size: 80))
+            // 垂直卦象符号
+            HexagramSymbolView(hexagram: hexagram, size: 120)
             
             // 卦名
             Text(hexagram.chineseName)

@@ -92,43 +92,47 @@ struct HexagramListView: View {
                 .padding()
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppConstants.Colors.background)
     }
 }
 
-// MARK: - Hexagram Card View
+// MARK: - Hexagram Card View (优化设计)
 struct HexagramCardView: View {
     let hexagram: Hexagram
     let isFavorite: Bool
     
     var body: some View {
-        HStack(spacing: 15) {
-            // 卦象符号
-            Text(hexagram.symbol)
-                .font(.system(size: 40))
-                .frame(width: 60, height: 60)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
+        HStack(spacing: 14) {
+            // 卦象符号 - 带装饰背景
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(AppConstants.Colors.elegantGradient)
+                    .frame(width: 65, height: 75)
+                
+                HexagramSymbolView(hexagram: hexagram, size: 38)
+            }
             
             // 卦象信息
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 6) {
                     Text(hexagram.displayName)
-                        .font(.headline)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(AppConstants.Colors.primary)
+                        .lineLimit(1)
                     
                     if isFavorite {
                         Image(systemName: "star.fill")
-                            .font(.caption)
-                            .foregroundColor(.yellow)
+                            .font(.system(size: 12))
+                            .foregroundColor(AppConstants.Colors.accent)
                     }
                 }
                 
                 Text(hexagram.trigramDescription)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 13))
+                    .foregroundColor(AppConstants.Colors.primaryLight)
                 
                 Text(hexagram.description)
-                    .font(.caption)
+                    .font(.system(size: 12))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
             }
@@ -136,13 +140,18 @@ struct HexagramCardView: View {
             Spacer()
             
             Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppConstants.Colors.accent.opacity(0.6))
         }
-        .padding()
+        .padding(.vertical, 14)
+        .padding(.horizontal, 16)
         .background(Color(.systemBackground))
         .cornerRadius(AppConstants.UI.cornerRadius)
-        .shadow(color: .black.opacity(0.05), radius: 3)
+        .shadow(
+            color: .black.opacity(AppConstants.UI.shadowOpacity),
+            radius: 6,
+            y: 3
+        )
     }
 }
 
@@ -162,37 +171,53 @@ struct TrigramListView: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(AppConstants.Colors.background)
     }
 }
 
-// MARK: - Trigram Card View
+// MARK: - Trigram Card View (优化设计)
 struct TrigramCardView: View {
     let trigram: Trigram
     
     var body: some View {
-        HStack(spacing: 15) {
-            // 卦象符号
-            Text(trigram.symbol)
-                .font(.system(size: 40))
-                .frame(width: 60, height: 60)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
+        HStack(spacing: 16) {
+            // 卦象符号 - 优雅背景
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(AppConstants.Colors.elegantGradient)
+                    .frame(width: 70, height: 70)
+                
+                Text(trigram.symbol)
+                    .font(.system(size: 36))
+            }
             
             // 卦象信息
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(trigram.name)
-                    .font(.headline)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(AppConstants.Colors.primary)
                 
-                HStack(spacing: 15) {
-                    Label(trigram.symbolism, systemImage: "cloud.sun")
-                        .font(.caption)
+                HStack(spacing: 12) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 10))
+                        Text(trigram.element)
+                            .font(.system(size: 12))
+                    }
                     
-                    Label(trigram.element, systemImage: "flame")
-                        .font(.caption)
+                    HStack(spacing: 4) {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 10))
+                        Text(trigram.direction)
+                            .font(.system(size: 12))
+                    }
                     
-                    Label(trigram.direction, systemImage: "location")
-                        .font(.caption)
+                    HStack(spacing: 4) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 10))
+                        Text(trigram.symbolism)
+                            .font(.system(size: 12))
+                    }
                 }
                 .foregroundColor(.secondary)
             }
@@ -200,81 +225,175 @@ struct TrigramCardView: View {
             Spacer()
             
             Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppConstants.Colors.accent.opacity(0.6))
         }
-        .padding()
+        .padding(16)
         .background(Color(.systemBackground))
         .cornerRadius(AppConstants.UI.cornerRadius)
-        .shadow(color: .black.opacity(0.05), radius: 3)
+        .shadow(
+            color: .black.opacity(AppConstants.UI.shadowOpacity),
+            radius: 6,
+            y: 3
+        )
     }
 }
 
-// MARK: - Trigram Detail View (临时实现)
+// MARK: - Trigram Detail View (优化版)
 struct TrigramDetailView: View {
     let trigram: Trigram
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // 卦象展示
-                HStack {
-                    Spacer()
+            VStack(spacing: 20) {
+                // 顶部卦象展示卡片
+                VStack(spacing: 16) {
+                    // 卦名
+                    Text(trigram.name)
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.primary)
+                    
+                    // 卦象符号
                     Text(trigram.symbol)
-                        .font(.system(size: 100))
-                    Spacer()
+                        .font(.system(size: 120))
+                        .padding(.vertical, 20)
+                    
+                    // 二进制表示
+                    Text(trigram.binary)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .tracking(8)
                 }
-                .padding()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 30)
+                .background(
+                    LinearGradient(
+                        colors: [Color(.systemGray6), Color(.systemGray5)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
                 
-                // 基本信息
-                VStack(alignment: .leading, spacing: 12) {
-                    InfoRow(title: "五行", value: trigram.element)
-                    InfoRow(title: "方位", value: trigram.direction)
-                    InfoRow(title: "象征", value: trigram.symbolism)
-                    InfoRow(title: "性质", value: trigram.nature)
-                    InfoRow(title: "家庭", value: trigram.family)
+                // 核心属性卡片
+                VStack(spacing: 0) {
+                    AttributeRow(
+                        icon: "flame.fill",
+                        iconColor: .orange,
+                        title: "五行",
+                        value: trigram.element
+                    )
+                    
+                    Divider().padding(.leading, 60)
+                    
+                    AttributeRow(
+                        icon: "location.fill",
+                        iconColor: .blue,
+                        title: "方位",
+                        value: trigram.direction
+                    )
+                    
+                    Divider().padding(.leading, 60)
+                    
+                    AttributeRow(
+                        icon: "sparkles",
+                        iconColor: .purple,
+                        title: "象征",
+                        value: trigram.symbolism
+                    )
+                    
+                    Divider().padding(.leading, 60)
+                    
+                    AttributeRow(
+                        icon: "waveform.path.ecg",
+                        iconColor: .green,
+                        title: "性质",
+                        value: trigram.nature
+                    )
+                    
+                    Divider().padding(.leading, 60)
+                    
+                    AttributeRow(
+                        icon: "person.3.fill",
+                        iconColor: .red,
+                        title: "家庭",
+                        value: trigram.family
+                    )
                 }
-                .padding()
                 .background(Color(.systemBackground))
-                .cornerRadius(AppConstants.UI.cornerRadius)
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
                 
-                // 详细说明
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("详细说明")
-                        .font(.headline)
+                // 详细说明卡片
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Image(systemName: "text.alignleft")
+                            .font(.system(size: 16))
+                            .foregroundColor(.blue)
+                        
+                        Text("详细说明")
+                            .font(.system(size: 18, weight: .semibold))
+                    }
                     
                     Text(trigram.description)
-                        .font(.body)
-                        .foregroundColor(.secondary)
+                        .font(.system(size: 16))
+                        .foregroundColor(.primary)
+                        .lineSpacing(6)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
                 .background(Color(.systemBackground))
-                .cornerRadius(AppConstants.UI.cornerRadius)
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
             }
-            .padding()
+            .padding(16)
         }
         .navigationTitle(trigram.name)
+        .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemGroupedBackground))
     }
 }
 
-// MARK: - Info Row
-struct InfoRow: View {
+// MARK: - Attribute Row (优化的属性行)
+struct AttributeRow: View {
+    let icon: String
+    let iconColor: Color
     let title: String
     let value: String
     
     var body: some View {
-        HStack {
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .frame(width: 60, alignment: .leading)
+        HStack(spacing: 16) {
+            // 图标
+            ZStack {
+                Circle()
+                    .fill(iconColor.opacity(0.15))
+                    .frame(width: 40, height: 40)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 16))
+                    .foregroundColor(iconColor)
+            }
             
+            // 标题
+            Text(title)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(.secondary)
+                .frame(width: 50, alignment: .leading)
+            
+            // 值
             Text(value)
-                .font(.body)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.primary)
+            
+            Spacer()
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
     }
 }
+
 
 #Preview {
     EncyclopediaView()

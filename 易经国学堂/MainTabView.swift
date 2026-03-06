@@ -11,13 +11,16 @@ struct MainTabView: View {
     @State private var selectedTab = 0
     
     init() {
-        // 配置TabBar外观
+        // 配置TabBar外观 - 易经主题
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.systemBackground
+        appearance.backgroundColor = UIColor.white
         
-        // 设置选中状态的颜色 - 使用更明显的蓝色
-        let selectedColor = UIColor.systemBlue
+        // 添加顶部分隔线
+        appearance.shadowColor = UIColor(red: 0.11, green: 0.37, blue: 0.31, alpha: 0.1)
+        
+        // 设置选中状态的颜色 - 使用墨绿色主题
+        let selectedColor = UIColor(red: 0.11, green: 0.37, blue: 0.31, alpha: 1.0) // #1B5E4F
         appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
             .foregroundColor: selectedColor,

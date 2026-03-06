@@ -1,10 +1,3 @@
-//
-//  HomeViewModel.swift
-//  易经国学堂
-//
-//  Created on 2025/11/17.
-//
-
 import Foundation
 
 class HomeViewModel: ObservableObject {
@@ -12,6 +5,7 @@ class HomeViewModel: ObservableObject {
     
     private var dataService: DataService?
     private var storageService: StorageService?
+    private var dailyHexagramId: Int? // 缓存每日卦象ID
     
     func setup(dataService: DataService, storageService: StorageService) {
         self.dataService = dataService
@@ -23,10 +17,21 @@ class HomeViewModel: ObservableObject {
         guard let dataService = dataService, 
               let storageService = storageService else { return }
         
-        // 获取今日卦象ID
-        if let dailyId = storageService.getDailyHexagramId() {
-            dailyHexagram = dataService.getHexagram(by: dailyId)
+        // 优化：先获取ID（这个操作很快，因为有缓存）
+        guard let dailyId = storageService.getDailyHexagramId() else { return }
+        
+        // 存储ID供后续使用
+        self.dailyHexagramId = dailyId
+        
+        // 异步加载卦象数据，避免阻塞UI
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.dailyHexagram = dataService.getHexagram(by: dailyId)
         }
     }
+    
+    /// 刷新每日一卦（用于测试或手动刷新）
+    func refreshDailyHexagram() {
+        loadDailyHexagram()
+    }
 }
-

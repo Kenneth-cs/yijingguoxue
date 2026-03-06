@@ -474,6 +474,7 @@ struct GameProgressBar: View {
 // MARK: - Question Content View
 struct QuestionContentView: View {
     let question: Question
+    @EnvironmentObject var dataService: DataService
     
     var body: some View {
         VStack(spacing: 20) {
@@ -484,16 +485,23 @@ struct QuestionContentView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
-            // 问题内容（卦象符号等）
-            Text(question.content)
-                .font(.system(size: 60, weight: .light))
-                .foregroundColor(.primary)
-                .padding(30)
-                .frame(maxWidth: .infinity)
-                .background(Color(.systemBackground))
-                .cornerRadius(AppConstants.UI.cornerRadius)
-                .shadow(color: .black.opacity(0.05), radius: 5)
-                .padding(.horizontal)
+            // 问题内容（卦象符号显示）
+            if let hexagram = dataService.getHexagram(by: question.hexagramId) {
+                // 使用垂直卦象视图
+                HexagramSymbolView(hexagram: hexagram, size: 140)
+                    .padding(.horizontal)
+            } else {
+                // 降级方案：使用文本显示
+                Text(question.content)
+                    .font(.system(size: 60, weight: .light))
+                    .foregroundColor(.primary)
+                    .padding(30)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemBackground))
+                    .cornerRadius(AppConstants.UI.cornerRadius)
+                    .shadow(color: .black.opacity(0.05), radius: 5)
+                    .padding(.horizontal)
+            }
         }
     }
 }
