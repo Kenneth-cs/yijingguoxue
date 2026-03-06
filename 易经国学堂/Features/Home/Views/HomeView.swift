@@ -251,7 +251,7 @@ extension HomeView {
 
     private var entries: [QuickEntry] {
         [
-            QuickEntry(title: "浏览卦象", icon: "square.grid.2x2"),
+            QuickEntry(title: "64卦象", icon: "square.grid.2x2"),
             QuickEntry(title: "八卦基础", icon: "circle.hexagongrid"),
             QuickEntry(title: "认卦游戏", icon: "gamecontroller"),
             QuickEntry(title: "我的收藏", icon: "heart"),
@@ -260,9 +260,9 @@ extension HomeView {
 
     private var quickAccessRow: some View {
         HStack(spacing: 0) {
-            // 浏览卦象
+            // 64卦象
             NavigationLink(destination: EncyclopediaView(initialSegment: 0, showBackButton: true)) {
-                quickEntryItem(title: "浏览卦象", icon: "square.grid.2x2")
+                quickEntryItem(title: "64卦象", icon: "square.grid.2x2")
             }
             .buttonStyle(PlainButtonStyle())
 

@@ -151,25 +151,25 @@ struct HexagramListCell: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // 左侧：序号图片 (绿色块)
-            ZStack {
+            // 左侧：卦象图标（与详情页同款自绘线条，白色）
+            ZStack(alignment: .bottomTrailing) {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(AppConstants.Colors.deepGreen)
                     .frame(width: 56, height: 56)
-                
-                Text(hexagram.symbol)
-                    .font(.system(size: 36))
-                    .foregroundColor(.white.opacity(0.9))
-                    .offset(y: -2)
-                
-                // 序号
+
+                // 自绘六爻，与详情页保持一致
+                MiniHexagramSymbol(hexagram: hexagram, color: .white.opacity(0.92))
+                    .frame(width: 56, height: 56)
+
+                // 序号角标
                 Text(String(format: "%02d", hexagram.id))
-                    .font(AppConstants.Fonts.bold(10))
+                    .font(AppConstants.Fonts.bold(9))
                     .foregroundColor(.white.opacity(0.6))
-                    .padding(4)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
                     .background(Color.black.opacity(0.2))
-                    .cornerRadius(4)
-                    .offset(x: 18, y: 18)
+                    .cornerRadius(3)
+                    .padding(3)
             }
             
             // 中间：信息
@@ -249,6 +249,47 @@ struct TrigramListCell: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
+    }
+}
+
+// MARK: - 列表用迷你卦象（与详情页 HexagramSymbolView 同逻辑，白色线条版）
+struct MiniHexagramSymbol: View {
+    let hexagram: Hexagram
+    let color: Color
+
+    init(hexagram: Hexagram, color: Color = .white) {
+        self.hexagram = hexagram
+        self.color = color
+    }
+
+    // 线条尺寸：适配 56×56 绿色方块
+    private let lineW: CGFloat = 30
+    private let lineH: CGFloat = 3
+    private let gap:   CGFloat = 5   // 阴爻中间缝隙
+    private let vSpacing: CGFloat = 3.5
+
+    var body: some View {
+        VStack(spacing: vSpacing) {
+            // 从上往下：position 6 → 1，与详情页顺序一致
+            ForEach(hexagram.lines.reversed(), id: \.position) { line in
+                if line.isYang {
+                    // 阳爻 — 实线
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(color)
+                        .frame(width: lineW, height: lineH)
+                } else {
+                    // 阴爻 — 断线（两段 + 中间空隙）
+                    HStack(spacing: gap) {
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(color)
+                            .frame(width: (lineW - gap) / 2, height: lineH)
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(color)
+                            .frame(width: (lineW - gap) / 2, height: lineH)
+                    }
+                }
+            }
+        }
     }
 }
 
