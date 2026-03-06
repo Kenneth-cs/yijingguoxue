@@ -32,66 +32,77 @@ struct NotesView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                if storageService.studyNotes.isEmpty {
-                    emptyView
-                } else {
-                    notesList
-                }
-            }
-            .navigationTitle("学习笔记")
-            .searchable(text: $searchText, prompt: "搜索笔记")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAddNote = true }) {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-            .sheet(isPresented: $showingAddNote) {
-                NoteEditorView(hexagramId: selectedHexagramId)
+        ZStack {
+            Color(hex: "F5F7F9").ignoresSafeArea()
+
+            if storageService.studyNotes.isEmpty {
+                emptyView
+            } else {
+                notesList
             }
         }
+        .navigationTitle("学习笔记")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: "搜索笔记")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { showingAddNote = true }) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(Color(hex: "086B52"))
+                }
+            }
+        }
+        .sheet(isPresented: $showingAddNote) {
+            NoteEditorView(hexagramId: selectedHexagramId)
+        }
     }
-    
-    // MARK: - Empty View
+
+    // MARK: - 空状态
     private var emptyView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "note.text")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
-            
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: "086B52").opacity(0.08))
+                    .frame(width: 88, height: 88)
+                Image(systemName: "note.text")
+                    .font(.system(size: 36))
+                    .foregroundColor(Color(hex: "086B52").opacity(0.4))
+            }
+
             Text("还没有学习笔记")
-                .font(.title3)
-                .foregroundColor(.secondary)
-            
+                .font(AppConstants.Fonts.bold(16))
+                .foregroundColor(Color(hex: "0F1729"))
+
             Text("点击右上角 + 号开始记录")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
+                .font(AppConstants.Fonts.regular(13))
+                .foregroundColor(Color(hex: "94A3B8"))
+
             Button(action: { showingAddNote = true }) {
                 Text("创建第一条笔记")
-                    .font(.headline)
+                    .font(AppConstants.Fonts.bold(15))
                     .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(AppConstants.UI.cornerRadius)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 13)
+                    .background(Color(hex: "086B52"))
+                    .cornerRadius(24)
             }
-            .padding(.top, 10)
+            .padding(.top, 6)
         }
-        .padding()
     }
-    
-    // MARK: - Notes List
+
+    // MARK: - 笔记列表
     private var notesList: some View {
-        List {
-            ForEach(filteredNotes) { note in
-                NavigationLink(destination: NoteDetailView(note: note)) {
-                    NoteRowView(note: note)
+        ScrollView(showsIndicators: false) {
+            LazyVStack(spacing: 12) {
+                ForEach(filteredNotes) { note in
+                    NavigationLink(destination: NoteDetailView(note: note)) {
+                        NoteRowView(note: note)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
-            .onDelete(perform: deleteNotes)
+            .padding(16)
         }
     }
     
@@ -104,55 +115,59 @@ struct NotesView: View {
     }
 }
 
-// MARK: - Note Row View
+// MARK: - 笔记行
 struct NoteRowView: View {
     @EnvironmentObject var dataService: DataService
     let note: StudyNote
-    
+
     var hexagram: Hexagram? {
         dataService.getHexagram(by: note.hexagramId)
     }
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             // 卦象标题
             if let hexagram = hexagram {
-                HStack {
+                HStack(spacing: 8) {
                     Text(hexagram.symbol)
-                        .font(.title3)
-                    
+                        .font(.system(size: 20))
                     Text(hexagram.chineseName)
-                        .font(.headline)
-                    
+                        .font(AppConstants.Fonts.bold(15))
+                        .foregroundColor(Color(hex: "0F1729"))
                     Spacer()
+                    if note.createdAt != note.updatedAt {
+                        Text("已编辑")
+                            .font(AppConstants.Fonts.regular(11))
+                            .foregroundColor(Color(hex: "086B52").opacity(0.7))
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color(hex: "086B52").opacity(0.08))
+                            .cornerRadius(6)
+                    }
                 }
             }
-            
+
             // 笔记内容预览
             Text(note.content)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                .font(AppConstants.Fonts.regular(14))
+                .foregroundColor(Color(hex: "64748B"))
                 .lineLimit(2)
-            
-            // 时间信息
-            HStack {
+                .lineSpacing(4)
+
+            // 时间
+            HStack(spacing: 4) {
                 Image(systemName: "clock")
-                    .font(.caption)
-                
+                    .font(.system(size: 11))
                 Text(note.updatedAt.relativeDescription)
-                    .font(.caption)
-                
+                    .font(AppConstants.Fonts.regular(12))
                 Spacer()
-                
-                if note.createdAt != note.updatedAt {
-                    Text("已编辑")
-                        .font(.caption2)
-                        .foregroundColor(.orange)
-                }
             }
-            .foregroundColor(.secondary)
+            .foregroundColor(Color(hex: "94A3B8"))
         }
-        .padding(.vertical, 4)
+        .padding(14)
+        .background(Color.white)
+        .cornerRadius(14)
+        .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
     }
 }
 
@@ -171,54 +186,52 @@ struct NoteDetailView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 16) {
                 // 卦象信息
                 if let hexagram = hexagram {
                     HexagramInfoCard(hexagram: hexagram)
                 }
-                
+
                 // 笔记内容
                 VStack(alignment: .leading, spacing: 10) {
                     Text("笔记内容")
-                        .font(.headline)
-                    
+                        .font(AppConstants.Fonts.bold(13))
+                        .foregroundColor(Color(hex: "94A3B8"))
+                        .tracking(0.6)
+
                     Text(note.content)
-                        .font(.body)
-                        .padding()
+                        .font(AppConstants.Fonts.regular(15))
+                        .foregroundColor(Color(hex: "0F1729"))
+                        .lineSpacing(5)
+                        .padding(16)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(.systemBackground))
-                        .cornerRadius(AppConstants.UI.cornerRadius)
+                        .background(Color.white)
+                        .cornerRadius(14)
+                        .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
                 }
-                
+
                 // 时间信息
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Image(systemName: "calendar")
-                        Text("创建时间：")
-                        Text(note.createdAt.chineseDateString)
-                    }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    
-                    if note.createdAt != note.updatedAt {
-                        HStack {
-                            Image(systemName: "pencil.circle")
-                            Text("更新时间：")
-                            Text(note.updatedAt.chineseDateString)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("记录时间")
+                        .font(AppConstants.Fonts.bold(13))
+                        .foregroundColor(Color(hex: "94A3B8"))
+                        .tracking(0.6)
+
+                    VStack(spacing: 0) {
+                        timeRow(icon: "calendar", label: "创建时间", value: note.createdAt.chineseDateString, showDivider: note.createdAt != note.updatedAt)
+                        if note.createdAt != note.updatedAt {
+                            timeRow(icon: "pencil.circle", label: "更新时间", value: note.updatedAt.chineseDateString, showDivider: false)
                         }
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                     }
+                    .background(Color.white)
+                    .cornerRadius(14)
+                    .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
                 }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(AppConstants.UI.cornerRadius)
             }
-            .padding()
+            .padding(16)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(hex: "F5F7F9").ignoresSafeArea())
         .navigationTitle("笔记详情")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -249,32 +262,52 @@ struct NoteDetailView: View {
             Text("确定要删除这条笔记吗？此操作无法撤销。")
         }
     }
+
+    private func timeRow(icon: String, label: String, value: String, showDivider: Bool) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundColor(Color(hex: "086B52"))
+                Text(label)
+                    .font(AppConstants.Fonts.regular(14))
+                    .foregroundColor(Color(hex: "64748B"))
+                Spacer()
+                Text(value)
+                    .font(AppConstants.Fonts.regular(13))
+                    .foregroundColor(Color(hex: "94A3B8"))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            if showDivider { Divider().padding(.horizontal, 16) }
+        }
+    }
 }
 
-// MARK: - Hexagram Info Card
+// MARK: - 卦象信息卡片
 struct HexagramInfoCard: View {
     let hexagram: Hexagram
-    
+
     var body: some View {
-        HStack(spacing: 15) {
+        HStack(spacing: 14) {
             Text(hexagram.symbol)
-                .font(.system(size: 50))
-            
+                .font(.system(size: 44))
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(hexagram.chineseName)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
+                    .font(AppConstants.Fonts.bold(18))
+                    .foregroundColor(Color(hex: "0F1729"))
                 Text(hexagram.trigramDescription)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(AppConstants.Fonts.regular(13))
+                    .foregroundColor(Color(hex: "64748B"))
             }
-            
+
             Spacer()
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(AppConstants.UI.cornerRadius)
+        .padding(16)
+        .background(Color.white)
+        .cornerRadius(14)
+        .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
     }
 }
 
@@ -309,60 +342,131 @@ struct NoteEditorView: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section("卦象") {
-                    Button(action: { showingHexagramPicker = true }) {
-                        HStack {
-                            if let hexagram = selectedHexagram {
-                                Text(hexagram.symbol)
-                                    .font(.title3)
-                                
-                                Text(hexagram.chineseName)
-                                    .foregroundColor(.primary)
-                                
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 20) {
+
+                    // ── 选择卦象 ──────────────────────────────────────────
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("卦象")
+                            .font(AppConstants.Fonts.bold(13))
+                            .foregroundColor(Color(hex: "94A3B8"))
+                            .tracking(0.6)
+
+                        Button(action: { showingHexagramPicker = true }) {
+                            HStack(spacing: 12) {
+                                if let hexagram = selectedHexagram {
+                                    Text(hexagram.symbol)
+                                        .font(.system(size: 24))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(hexagram.chineseName)
+                                            .font(AppConstants.Fonts.bold(16))
+                                            .foregroundColor(Color(hex: "0F1729"))
+                                        Text(hexagram.trigramDescription)
+                                            .font(AppConstants.Fonts.regular(12))
+                                            .foregroundColor(Color(hex: "64748B"))
+                                    }
+                                }
                                 Spacer()
-                                
                                 Image(systemName: "chevron.right")
-                                    .foregroundColor(.secondary)
-                                    .font(.caption)
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(Color(hex: "086B52"))
                             }
+                            .padding(16)
+                            .background(Color.white)
+                            .cornerRadius(14)
+                            .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                }
-                
-                Section("笔记内容") {
-                    TextEditor(text: $content)
-                        .frame(minHeight: 200)
-                }
-                
-                if let note = note {
-                    Section("时间信息") {
-                        LabeledContent("创建时间", value: note.createdAt.chineseDateString)
-                        LabeledContent("更新时间", value: note.updatedAt.chineseDateString)
+
+                    // ── 笔记内容 ──────────────────────────────────────────
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("笔记内容")
+                            .font(AppConstants.Fonts.bold(13))
+                            .foregroundColor(Color(hex: "94A3B8"))
+                            .tracking(0.6)
+
+                        ZStack(alignment: .topLeading) {
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color.white)
+                                .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
+
+                            if content.isEmpty {
+                                Text("在此记录你的学习心得…")
+                                    .font(AppConstants.Fonts.regular(15))
+                                    .foregroundColor(Color(hex: "C4CEDD"))
+                                    .padding(.horizontal, 18)
+                                    .padding(.top, 18)
+                            }
+
+                            TextEditor(text: $content)
+                                .font(AppConstants.Fonts.regular(15))
+                                .foregroundColor(Color(hex: "0F1729"))
+                                .frame(minHeight: 220)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 12)
+                                .scrollContentBackground(.hidden)
+                                .background(Color.clear)
+                        }
+                        .frame(minHeight: 220)
                     }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+
+                    // ── 时间信息（编辑模式） ────────────────────────────────
+                    if let note = note {
+                        VStack(spacing: 0) {
+                            noteTimeRow(icon: "calendar", label: "创建时间",
+                                        value: note.createdAt.chineseDateString, showDivider: true)
+                            noteTimeRow(icon: "pencil.circle", label: "更新时间",
+                                        value: note.updatedAt.chineseDateString, showDivider: false)
+                        }
+                        .background(Color.white)
+                        .cornerRadius(14)
+                        .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
+                    }
+
+                    Spacer(minLength: 40)
                 }
+                .padding(16)
             }
+            .background(Color(hex: "F5F7F9").ignoresSafeArea())
             .navigationTitle(note == nil ? "新建笔记" : "编辑笔记")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("取消") {
-                        dismiss()
-                    }
+                    Button("取消") { dismiss() }
+                        .font(AppConstants.Fonts.regular(16))
+                        .foregroundColor(Color(hex: "086B52"))
                 }
-                
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("保存") {
-                        saveNote()
-                    }
-                    .disabled(!isValid)
+                    Button("保存") { saveNote() }
+                        .font(AppConstants.Fonts.bold(16))
+                        .foregroundColor(isValid ? Color(hex: "086B52") : Color(hex: "C4CEDD"))
+                        .disabled(!isValid)
                 }
             }
             .sheet(isPresented: $showingHexagramPicker) {
                 HexagramPickerView(selectedHexagramId: $selectedHexagramId)
             }
+        }
+    }
+
+    private func noteTimeRow(icon: String, label: String, value: String, showDivider: Bool) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundColor(Color(hex: "086B52"))
+                Text(label)
+                    .font(AppConstants.Fonts.regular(14))
+                    .foregroundColor(Color(hex: "64748B"))
+                Spacer()
+                Text(value)
+                    .font(AppConstants.Fonts.regular(13))
+                    .foregroundColor(Color(hex: "94A3B8"))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            if showDivider { Divider().padding(.horizontal, 16) }
         }
     }
     
@@ -431,7 +535,8 @@ struct HexagramPickerView: View {
                         
                         if hexagram.id == selectedHexagramId {
                             Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color(hex: "086B52"))
+                                .font(.system(size: 14, weight: .semibold))
                         }
                     }
                 }

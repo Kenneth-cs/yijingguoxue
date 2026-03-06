@@ -10,21 +10,27 @@ import SwiftUI
 struct PracticeView: View {
     @EnvironmentObject var storageService: StorageService
 
+    // 人生教练 App Store 链接（点击跳转，已安装则可直接打开）
+    private let coachAppStoreURL = URL(string: "https://apps.apple.com/cn/app/%E4%BA%BA%E7%94%9F%E6%95%99%E7%BB%83-%E6%88%90%E9%95%BF%E4%B8%8E%E5%86%B3%E7%AD%96%E5%8A%A9%E6%89%8B/id6753138853")!
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
 
-                // ── Banner ────────────────────────────────────────────────
-                Image("YaoGuaBanner")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 140)
-                    .clipped()
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.12), radius: 10, y: 5)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
+                // ── Banner（点击跳转人生教练 App）────────────────────────────
+                Button(action: openCoachApp) {
+                    Image("YaoGuaBanner")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 140)
+                        .clipped()
+                        .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.12), radius: 10, y: 5)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
 
                 // ── 专项练习 ───────────────────────────────────────────────
                 Text("专项练习")
@@ -99,6 +105,13 @@ struct PracticeView: View {
         .background(Color(hex: "F5F7F9").ignoresSafeArea())
         .navigationTitle("练习中心")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: - 跳转人生教练 App
+    // 已安装：App Store 页面显示「打开」按钮直接启动
+    // 未安装：App Store 页面显示「获取」按钮引导下载
+    private func openCoachApp() {
+        UIApplication.shared.open(coachAppStoreURL)
     }
 }
 
@@ -231,3 +244,4 @@ struct GameRecordsView: View {
 extension Color {
     static let transparent = Color.white.opacity(0)
 }
+
