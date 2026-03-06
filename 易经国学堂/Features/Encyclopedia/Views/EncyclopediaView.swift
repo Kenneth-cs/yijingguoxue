@@ -10,25 +10,30 @@ import SwiftUI
 struct EncyclopediaView: View {
     @EnvironmentObject var dataService: DataService
     @EnvironmentObject var storageService: StorageService
+    @Environment(\.dismiss) private var dismiss
+
     @State private var searchText = ""
     @State private var selectedSegment = 0 // 0: 六十四卦, 1: 八经卦
-    
-    init(initialSegment: Int = 0) {
+
+    /// 从首页快速入口推入时传 true，显示自定义返回按钮
+    var showBackButton: Bool = false
+
+    init(initialSegment: Int = 0, showBackButton: Bool = false) {
         _selectedSegment = State(initialValue: initialSegment)
+        self.showBackButton = showBackButton
     }
-    
+
     var body: some View {
         ZStack {
-            // 背景色
             Color(red: 0.96, green: 0.97, blue: 0.97).ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
-                // 1. 顶部搜索栏
+                // 1. 顶部搜索栏（含可选返回按钮）
                 searchBar
-                
+
                 // 2. 分段控制器
                 segmentControl
-                
+
                 // 3. 内容列表
                 ScrollView {
                     LazyVStack(spacing: 16) {
@@ -40,21 +45,35 @@ struct EncyclopediaView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
-                    .padding(.bottom, 100) // 留出底部 TabBar 空间
+                    .padding(.bottom, 100)
                 }
             }
         }
-        .navigationTitle("易经百科") // 实际上 UI 可能隐藏了原生导航栏，用自定义的
+        .navigationTitle("易经百科")
         .navigationBarHidden(true)
     }
     
-    // MARK: - 1. Search Bar
+    // MARK: - 1. Search Bar（含可选返回按钮）
     private var searchBar: some View {
-        HStack {
+        HStack(spacing: 10) {
+            // 从首页推入时显示返回按钮
+            if showBackButton {
+                Button(action: { dismiss() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 15, weight: .semibold))
+                        Text("返回")
+                            .font(AppConstants.Fonts.regular(15))
+                    }
+                    .foregroundColor(AppConstants.Colors.deepGreen)
+                }
+                .padding(.leading, 4)
+            }
+
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(AppConstants.Colors.deepGreen.opacity(0.6))
-                
+
                 TextField("搜索卦辞、象传或关键词", text: $searchText)
                     .font(AppConstants.Fonts.regular(16))
                     .foregroundColor(AppConstants.Colors.textPrimary)

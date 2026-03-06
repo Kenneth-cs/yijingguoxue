@@ -10,6 +10,9 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var dataService: DataService
     @EnvironmentObject var storageService: StorageService
+    @EnvironmentObject var notificationService: NotificationService
+
+    @State private var showTimePicker = false
 
     var body: some View {
         NavigationView {
@@ -50,6 +53,10 @@ struct ProfileView: View {
             .background(Color(hex: "F5F7F9").ignoresSafeArea())
             .navigationTitle("个人中心")
             .navigationBarTitleDisplayMode(.large)
+            .onAppear {
+                // 每次进入页面同步系统通知权限，避免开关与系统设置不一致
+                notificationService.syncAuthorizationStatus()
+            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
@@ -153,22 +160,12 @@ struct ProfileView: View {
     }
 
     // MARK: - 学习中心卡片
+    // 使用 ZStack 隐藏 NavigationLink + contentShape 解决 ScrollView 内多次点击问题
     private var studyCenterCard: some View {
         VStack(spacing: 0) {
-            NavigationLink(destination: FavoritesView()) {
-                menuRow(icon: "bookmark.fill", title: "我的收藏", showDivider: true)
-            }
-            .buttonStyle(PlainButtonStyle())
-
-            NavigationLink(destination: NotesView()) {
-                menuRow(icon: "doc.text.fill", title: "学习笔记", showDivider: true)
-            }
-            .buttonStyle(PlainButtonStyle())
-
-            NavigationLink(destination: GameRecordsView()) {
-                menuRow(icon: "trophy.fill", title: "练习记录", showDivider: false)
-            }
-            .buttonStyle(PlainButtonStyle())
+            navMenuRow(icon: "bookmark.fill",   title: "我的收藏", showDivider: true,  dest: AnyView(FavoritesView()))
+            navMenuRow(icon: "doc.text.fill",   title: "学习笔记", showDivider: true,  dest: AnyView(NotesView()))
+            navMenuRow(icon: "trophy.fill",     title: "练习记录", showDivider: false, dest: AnyView(GameRecordsView()))
         }
         .background(Color.white)
         .cornerRadius(14)
@@ -178,20 +175,21 @@ struct ProfileView: View {
     // MARK: - 应用设置卡片
     private var settingsCard: some View {
         VStack(spacing: 0) {
-            NavigationLink(destination: AboutView()) {
-                settingsRow(title: "关于应用", isShare: false, showDivider: true)
-            }
-            .buttonStyle(PlainButtonStyle())
 
-            NavigationLink(destination: PrivacyPolicyView()) {
-                settingsRow(title: "隐私政策", isShare: false, showDivider: true)
-            }
-            .buttonStyle(PlainButtonStyle())
+            // 每日提醒开关
+            notificationToggleRow
 
-            NavigationLink(destination: UserAgreementView()) {
-                settingsRow(title: "用户协议", isShare: false, showDivider: true)
+            // 提醒时间（仅开启时展示）
+            if notificationService.isEnabled {
+                Divider().padding(.horizontal, 16)
+                notificationTimeRow
             }
-            .buttonStyle(PlainButtonStyle())
+
+            Divider().padding(.horizontal, 16)
+
+            navSettingsRow(title: "关于应用",  isShare: false, showDivider: true,  dest: AnyView(AboutView()))
+            navSettingsRow(title: "隐私政策",  isShare: false, showDivider: true,  dest: AnyView(PrivacyPolicyView()))
+            navSettingsRow(title: "用户协议",  isShare: false, showDivider: true,  dest: AnyView(UserAgreementView()))
 
             Button(action: shareApp) {
                 settingsRow(title: "分享应用", isShare: true, showDivider: false)
@@ -201,6 +199,25 @@ struct ProfileView: View {
         .background(Color.white)
         .cornerRadius(14)
         .shadow(color: Color.black.opacity(0.04), radius: 6, y: 2)
+    }
+
+    // MARK: - 带图标的导航行
+    // .contentShape(Rectangle()) 让整行区域都响应点击，解决 ScrollView 内需多次点击的问题
+    private func navMenuRow(icon: String, title: String, showDivider: Bool, dest: AnyView) -> some View {
+        NavigationLink(destination: dest) {
+            menuRow(icon: icon, title: title, showDivider: showDivider)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    // MARK: - 无图标的导航行
+    private func navSettingsRow(title: String, isShare: Bool, showDivider: Bool, dest: AnyView) -> some View {
+        NavigationLink(destination: dest) {
+            settingsRow(title: title, isShare: isShare, showDivider: showDivider)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 
     // MARK: - 菜单行（带图标）
@@ -233,6 +250,57 @@ struct ProfileView: View {
                 Divider()
                     .padding(.leading, 68)
             }
+        }
+    }
+
+    // MARK: - 每日提醒开关行
+    private var notificationToggleRow: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color(hex: "086B52").opacity(0.10))
+                    .frame(width: 38, height: 38)
+                Image(systemName: "bell.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(Color(hex: "086B52"))
+            }
+            Text("每日提醒")
+                .font(AppConstants.Fonts.medium(16))
+                .foregroundColor(Color(hex: "0F1729"))
+            Spacer()
+            Toggle("", isOn: $notificationService.isEnabled)
+                .labelsHidden()
+                .tint(Color(hex: "086B52"))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+    }
+
+    // MARK: - 提醒时间选择行
+    private var notificationTimeRow: some View {
+        Button(action: { showTimePicker = true }) {
+            HStack {
+                Text("提醒时间")
+                    .font(AppConstants.Fonts.medium(16))
+                    .foregroundColor(Color(hex: "0F1729"))
+                Spacer()
+                Text(notificationService.timeString)
+                    .font(AppConstants.Fonts.regular(15))
+                    .foregroundColor(Color(hex: "086B52"))
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color(hex: "C4CEDD"))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .sheet(isPresented: $showTimePicker) {
+            TimePickerSheet(
+                hour: $notificationService.hour,
+                minute: $notificationService.minute,
+                isPresented: $showTimePicker
+            )
         }
     }
 
@@ -467,8 +535,102 @@ struct FeatureRow: View {
     }
 }
 
+// MARK: - 时间选择弹窗
+struct TimePickerSheet: View {
+    @Binding var hour: Int
+    @Binding var minute: Int
+    @Binding var isPresented: Bool
+
+    // 本地临时值，确认后再写入
+    @State private var selectedHour: Int
+    @State private var selectedMinute: Int
+
+    init(hour: Binding<Int>, minute: Binding<Int>, isPresented: Binding<Bool>) {
+        _hour = hour
+        _minute = minute
+        _isPresented = isPresented
+        _selectedHour   = State(initialValue: hour.wrappedValue)
+        _selectedMinute = State(initialValue: minute.wrappedValue)
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                // 说明文字
+                VStack(spacing: 6) {
+                    Image(systemName: "bell.badge.fill")
+                        .font(.system(size: 36))
+                        .foregroundColor(Color(hex: "086B52"))
+                    Text("选择每日提醒时间")
+                        .font(AppConstants.Fonts.bold(18))
+                        .foregroundColor(Color(hex: "0F1729"))
+                    Text("系统将在该时间随机推送一条易经学习提醒")
+                        .font(AppConstants.Fonts.regular(13))
+                        .foregroundColor(Color(hex: "94A3B8"))
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, 24)
+                .padding(.horizontal, 24)
+
+                // 滚轮选择器
+                HStack(spacing: 0) {
+                    // 小时
+                    Picker("小时", selection: $selectedHour) {
+                        ForEach(0..<24, id: \.self) { h in
+                            Text(String(format: "%02d 时", h))
+                                .font(AppConstants.Fonts.bold(18))
+                                .tag(h)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(maxWidth: .infinity)
+
+                    // 分钟（0、15、30、45）
+                    Picker("分钟", selection: $selectedMinute) {
+                        ForEach([0, 15, 30, 45], id: \.self) { m in
+                            Text(String(format: "%02d 分", m))
+                                .font(AppConstants.Fonts.bold(18))
+                                .tag(m)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(.horizontal, 16)
+                .tint(Color(hex: "086B52"))
+
+                // 确认按钮
+                Button(action: {
+                    hour   = selectedHour
+                    minute = selectedMinute
+                    isPresented = false
+                }) {
+                    Text("确认")
+                        .font(AppConstants.Fonts.bold(17))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color(hex: "086B52"))
+                        .cornerRadius(14)
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
+            }
+            .background(Color(hex: "F5F7F9").ignoresSafeArea())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("取消") { isPresented = false }
+                        .foregroundColor(Color(hex: "086B52"))
+                }
+            }
+        }
+    }
+}
+
 #Preview {
     ProfileView()
         .environmentObject(DataService.shared)
         .environmentObject(StorageService.shared)
+        .environmentObject(NotificationService.shared)
 }

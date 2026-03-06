@@ -261,19 +261,19 @@ extension HomeView {
     private var quickAccessRow: some View {
         HStack(spacing: 0) {
             // 浏览卦象
-            NavigationLink(destination: EncyclopediaView(initialSegment: 0)) {
+            NavigationLink(destination: EncyclopediaView(initialSegment: 0, showBackButton: true)) {
                 quickEntryItem(title: "浏览卦象", icon: "square.grid.2x2")
             }
             .buttonStyle(PlainButtonStyle())
 
             // 八卦基础
-            NavigationLink(destination: EncyclopediaView(initialSegment: 1)) {
+            NavigationLink(destination: EncyclopediaView(initialSegment: 1, showBackButton: true)) {
                 quickEntryItem(title: "八卦基础", icon: "circle.hexagongrid")
             }
             .buttonStyle(PlainButtonStyle())
 
-            // 认卦游戏
-            NavigationLink(destination: PracticeView()) {
+            // 认卦游戏（直接进入练习游戏选择）
+            NavigationLink(destination: GuessGameView()) {
                 quickEntryItem(title: "认卦游戏", icon: "gamecontroller")
             }
             .buttonStyle(PlainButtonStyle())

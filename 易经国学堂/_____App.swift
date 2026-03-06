@@ -12,7 +12,8 @@ struct YiJingApp: App {
     // 初始化服务
     @StateObject private var dataService = DataService.shared
     @StateObject private var storageService = StorageService.shared
-    
+    @StateObject private var notificationService = NotificationService.shared
+
     init() {
         setupAppearance()
     }
@@ -22,6 +23,11 @@ struct YiJingApp: App {
             MainTabView()
                 .environmentObject(dataService)
                 .environmentObject(storageService)
+                .environmentObject(notificationService)
+                .onAppear {
+                    // 启动时申请权限并（如已开启）调度通知
+                    notificationService.requestPermission()
+                }
         }
     }
     

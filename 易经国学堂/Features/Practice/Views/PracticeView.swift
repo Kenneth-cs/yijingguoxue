@@ -21,12 +21,10 @@ struct PracticeView: View {
                 Button(action: openCoachApp) {
                     Image("YaoGuaBanner")
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
+                        .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 140)
-                        .clipped()
                         .cornerRadius(16)
-                        .shadow(color: Color.black.opacity(0.12), radius: 10, y: 5)
+                        .shadow(color: Color.black.opacity(0.10), radius: 8, y: 4)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .padding(.horizontal, 16)

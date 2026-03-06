@@ -107,23 +107,23 @@ class StorageService: ObservableObject {
     }
     
     /// 基于设备UUID和日期生成稳定的卦象ID
+    /// 使用 DJB2 哈希算法（跨进程稳定，不受 Swift hashValue 随机化影响）
     private func generateDailyHexagramId() -> Int {
-        // 获取设备唯一标识符
         let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "default-device"
-        
-        // 获取当前日期字符串（格式：yyyyMMdd）
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMMdd"
         let dateString = dateFormatter.string(from: Date())
-        
-        // 组合设备ID和日期
+
         let seed = "\(deviceId)-\(dateString)"
-        
-        // 使用哈希值生成1-64之间的卦象ID
-        let hash = seed.hashValue
-        let hexagramId = abs(hash % 64) + 1
-        
-        return hexagramId
+
+        // DJB2 哈希：同一输入永远得到同一结果，不受进程/系统版本影响
+        var hash: UInt64 = 5381
+        for char in seed.unicodeScalars {
+            hash = hash &* 33 &+ UInt64(char.value)
+        }
+
+        return Int(hash % 64) + 1   // 1 ~ 64
     }
     
     /// 增加学习时长
