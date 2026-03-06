@@ -136,6 +136,17 @@ enum AppConstants {
             Font.custom("Songti SC Light", size: size)
         }
 
+        /// 中等宋体 —— 用于需要强调但不过于厚重的文字
+        static func medium(_ size: CGFloat) -> Font {
+            // Songti SC usually doesn't have a Medium weight file, so we simulate it or use Bold if preferred.
+            // Using system synthesis for medium weight on top of regular font if possible, 
+            // but Custom fonts often don't support .weight modifier well if the font face doesn't exist.
+            // Let's use Bold for now as it's a safe distinct weight, or Regular.
+            // Given the design usually distinguishes Regular vs Bold, Medium is often a slightly thinner Bold.
+            // Let's try to map it to Regular with a weight modifier, which SwiftUI might synthesize.
+            Font.custom("Songti SC", size: size).weight(.medium)
+        }
+
         // ── 预定义尺寸（按用途分三档字重）──────────────────────
         static let largeTitle  = bold(32)      // 超大标题（封面级）
         static let title1      = bold(24)      // 页面大标题
@@ -163,30 +174,6 @@ enum AppConstants {
 }
 
 // MARK: - Color Extension for Hex
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 0)
-        }
+// Removed duplicate Color(hex:) definition. Use the one in Extensions.swift.
 
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue:  Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
-}
 

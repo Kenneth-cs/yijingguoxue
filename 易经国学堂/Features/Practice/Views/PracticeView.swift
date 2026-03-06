@@ -12,135 +12,214 @@ struct PracticeView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // 游戏选项
-                    gameOptionsSection
-                    
-                    // 最近游戏记录
-                    recentRecordsSection
+            ZStack {
+                Color(hex: "F5F7F9")
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Banner
+                        dailyChallengeBanner
+                        
+                        // Game Options
+                        gameOptionsSection
+                        
+                        // Recent Records
+                        recentRecordsSection
+                    }
+                    .padding(.bottom, 40)
                 }
-                .padding(DeviceType.value(iPad: 24, iPhone: 16))
-                .centerContent()
             }
-            .navigationTitle("互动练习")
-            .background(Color(.systemGroupedBackground))
+            .navigationTitle("练习中心")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
     
-    // MARK: - Game Options Section
-    private var gameOptionsSection: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            Text("选择游戏")
-                .font(.headline)
-                .padding(.horizontal)
+    // MARK: - Banner
+    private var dailyChallengeBanner: some View {
+        ZStack(alignment: .leading) {
+            // Background Image
+            Image("PracticeBackground")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 200)
+                .clipped()
+                .cornerRadius(12)
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
-                GameOptionCard(
-                    title: "认卦游戏",
-                    description: "识别卦象符号",
-                    icon: "brain.head.profile",
-                    color: .blue,
-                    gameType: .memoryGame
-                )
+            // Overlay Gradient for text readability
+            LinearGradient(
+                gradient: Gradient(colors: [Color.black.opacity(0.6), Color.transparent]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .cornerRadius(12)
+            
+            // Content
+            VStack(alignment: .leading, spacing: 12) {
+                Text("开启每日挑战")
+                    .font(AppConstants.Fonts.bold(24))
+                    .foregroundColor(.white)
                 
-                GameOptionCard(
-                    title: "知识问答",
-                    description: "测试易经知识",
-                    icon: "questionmark.circle",
-                    color: .green,
-                    gameType: .quiz
-                )
+                Text("通过趣味练习巩固易经知识，提升感悟。")
+                    .font(AppConstants.Fonts.medium(14))
+                    .foregroundColor(.white.opacity(0.9))
+                    .lineLimit(2)
                 
-                GameOptionCard(
-                    title: "卦象识别",
-                    description: "识别卦名",
-                    icon: "eye",
-                    color: .purple,
-                    gameType: .symbolRecognition
-                )
-                
-                GameOptionCard(
-                    title: "爻辞配对",
-                    description: "匹配爻辞",
-                    icon: "link",
-                    color: .orange,
-                    gameType: .lineMatch
-                )
+                Button(action: {
+                    // Start a random game or specific challenge
+                    // For now, let's start Symbol Recognition as "Daily Challenge"
+                    // Or maybe push a random game view.
+                    // Since we can't easily push from here without NavigationLink or state,
+                    // let's just make it visual for now or link to one game.
+                }) {
+                    Text("开始挑战")
+                        .font(AppConstants.Fonts.bold(14))
+                        .foregroundColor(Color(hex: "086B52"))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.white)
+                        .cornerRadius(8)
+                }
+                .padding(.top, 8)
             }
+            .padding(24)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, y: 5)
+    }
+    
+// MARK: - Game Options Section
+    private var gameOptionsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("专项练习")
+                .font(AppConstants.Fonts.bold(20))
+                .foregroundColor(Color(hex: "0F1729"))
+                .padding(.horizontal, 16)
+            
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                // 认卦游戏
+                NavigationLink(destination: GuessGameView()) {
+                    GameOptionCard(
+                        title: "认卦游戏",
+                        subtitle: "识别六十四卦象",
+                        icon: "square.grid.2x2", // Using SF Symbol as placeholder for custom icon
+                        color: Color(hex: "086B52")
+                    )
+                }
+                
+                // 知识问答
+                NavigationLink(destination: QuizView()) {
+                    GameOptionCard(
+                        title: "知识问答",
+                        subtitle: "经传理论考核",
+                        icon: "questionmark.circle",
+                        color: Color(hex: "086B52")
+                    )
+                }
+                
+                // 卦象识别
+                NavigationLink(destination: SymbolGameView()) {
+                    GameOptionCard(
+                        title: "卦象识别",
+                        subtitle: "快速分辨阴阳爻",
+                        icon: "eye",
+                        color: Color(hex: "086B52")
+                    )
+                }
+                
+                // 爻辞配对
+                NavigationLink(destination: LineMatchingView()) {
+                    GameOptionCard(
+                        title: "爻辞匹对", // UI uses "匹对"
+                        subtitle: "对应位阶与涵义",
+                        icon: "list.dash",
+                        color: Color(hex: "086B52")
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
         }
     }
     
     // MARK: - Recent Records Section
     private var recentRecordsSection: some View {
-        VStack(alignment: .leading, spacing: 15) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("最近记录")
-                    .font(.headline)
+                    .font(AppConstants.Fonts.bold(20))
+                    .foregroundColor(Color(hex: "0F1729"))
                 
                 Spacer()
                 
-                NavigationLink("查看全部", destination: GameRecordsView())
-                    .font(.subheadline)
+                NavigationLink(destination: GameRecordsView()) {
+                    Text("查看全部")
+                        .font(AppConstants.Fonts.medium(14))
+                        .foregroundColor(Color(hex: "086B52"))
+                }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 16)
             
             if storageService.gameRecords.isEmpty {
-                Text("还没有游戏记录")
+                Text("暂无记录")
+                    .font(AppConstants.Fonts.regular(14))
                     .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
-                    .background(Color(.systemBackground))
-                    .cornerRadius(AppConstants.UI.cornerRadius)
+                    .padding(.horizontal, 16)
             } else {
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     ForEach(storageService.gameRecords.prefix(3)) { record in
                         GameRecordRow(record: record)
                     }
                 }
+                .padding(.horizontal, 16)
             }
         }
     }
 }
 
-// MARK: - Game Option Card
+// MARK: - Helper Views
+
 struct GameOptionCard: View {
     let title: String
-    let description: String
+    let subtitle: String
     let icon: String
     let color: Color
-    let gameType: GameRecord.GameType
-    
-    @State private var showingGame = false
     
     var body: some View {
-        Button(action: { showingGame = true }) {
-            VStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 40))
-                    .foregroundColor(color)
+        VStack(alignment: .leading, spacing: 16) {
+            // Icon
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(color.opacity(0.1))
+                    .frame(width: 40, height: 40)
                 
-                VStack(spacing: 4) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    Text(description)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(color)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 140)
-            .background(Color(.systemBackground))
-            .cornerRadius(AppConstants.UI.cornerRadius)
-            .shadow(color: .black.opacity(0.05), radius: 5)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(AppConstants.Fonts.bold(16))
+                    .foregroundColor(Color(hex: "0F1729"))
+                
+                Text(subtitle)
+                    .font(AppConstants.Fonts.regular(12))
+                    .foregroundColor(Color(hex: "64748B"))
+            }
         }
-        .sheet(isPresented: $showingGame) {
-            GamePlayView(gameType: gameType)
-        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
     }
+}
+
+// Extension for transparent color
+extension Color {
+    static let transparent = Color.white.opacity(0)
 }
 
 // MARK: - Game Record Row
@@ -148,461 +227,46 @@ struct GameRecordRow: View {
     let record: GameRecord
     
     var body: some View {
-        HStack {
-            Image(systemName: record.gameType.icon)
-                .font(.title3)
-                .foregroundColor(.blue)
-                .frame(width: 40)
+        HStack(spacing: 16) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(Color(hex: "086B52").opacity(0.1))
+                    .frame(width: 40, height: 40)
+                
+                Image(systemName: record.gameType.icon)
+                    .font(.system(size: 18))
+                    .foregroundColor(Color(hex: "086B52"))
+            }
             
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(record.gameType.rawValue)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    .font(AppConstants.Fonts.bold(16))
+                    .foregroundColor(Color(hex: "0F1729"))
                 
                 Text(record.formattedDate)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(AppConstants.Fonts.regular(12))
+                    .foregroundColor(Color(hex: "64748B"))
             }
             
             Spacer()
             
-            VStack(alignment: .trailing, spacing: 2) {
+            VStack(alignment: .trailing, spacing: 4) {
                 Text("\(record.score)分")
-                    .font(.headline)
-                    .foregroundColor(.blue)
+                    .font(AppConstants.Fonts.bold(16))
+                    .foregroundColor(Color(hex: "086B52"))
                 
-                Text("\(record.accuracy)%正确")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(AppConstants.UI.cornerRadius)
-    }
-}
-
-// MARK: - Game Play View
-struct GamePlayView: View {
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var gameService = GameService.shared
-    @EnvironmentObject var dataService: DataService
-    @EnvironmentObject var storageService: StorageService
-    
-    let gameType: GameRecord.GameType
-    
-    @State private var selectedAnswer: String? = nil
-    @State private var showingResult = false
-    @State private var isCorrect = false
-    @State private var showingCompletion = false
-    @State private var gameRecord: GameRecord? = nil
-    
-    var body: some View {
-        NavigationView {
-            ZStack {
-                if !gameService.isGameActive {
-                    gameStartView
-                } else if let game = gameService.currentGame {
-                    if game.isFinished {
-                        gameCompletionView
-                    } else {
-                        gamePlayingView(game: game)
-                    }
-                }
-            }
-            .navigationTitle(gameType.rawValue)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("退出") {
-                        if gameService.isGameActive {
-                            _ = gameService.endGame()
-                        }
-                        dismiss()
-                    }
+                if record.accuracy > 0 {
+                    Text("\(record.accuracy)% 正确")
+                        .font(AppConstants.Fonts.regular(12))
+                        .foregroundColor(Color(hex: "64748B"))
                 }
             }
         }
-        .onAppear {
-            if !gameService.isGameActive {
-                gameService.startGame(type: gameType)
-            }
-        }
-    }
-    
-    // MARK: - Game Start View
-    private var gameStartView: some View {
-        VStack(spacing: 30) {
-            Image(systemName: gameType.icon)
-                .font(.system(size: 80))
-                .foregroundColor(.blue)
-            
-            VStack(spacing: 10) {
-                Text(gameType.rawValue)
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Text("准备开始游戏")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Button(action: {
-                gameService.startGame(type: gameType)
-            }) {
-                Text("开始游戏")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(AppConstants.UI.cornerRadius)
-            }
-            .padding(.horizontal, 40)
-        }
-    }
-    
-    // MARK: - Game Playing View
-    private func gamePlayingView(game: Game) -> some View {
-        VStack(spacing: 0) {
-            // 进度条
-            GameProgressBar(
-                current: game.currentQuestionIndex + 1,
-                total: game.questions.count,
-                score: game.score
-            )
-            .padding()
-            .centerContent()
-            
-            ScrollView {
-                if let question = game.currentQuestion {
-                    VStack(spacing: 25) {
-                        // 问题内容
-                        QuestionContentView(question: question)
-                            .padding(.top, 20)
-                        
-                        // 答案选项
-                        AnswerOptionsView(
-                            question: question,
-                            selectedAnswer: $selectedAnswer,
-                            showingResult: showingResult,
-                            isCorrect: isCorrect
-                        )
-                        .padding(.horizontal)
-                        
-                        // 提交按钮
-                        Button(action: submitAnswer) {
-                            Text(showingResult ? "下一题" : "提交答案")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(selectedAnswer == nil && !showingResult ? Color.gray : Color.blue)
-                                .cornerRadius(AppConstants.UI.cornerRadius)
-                        }
-                        .disabled(selectedAnswer == nil && !showingResult)
-                        .padding(.horizontal)
-                        .padding(.top, 10)
-                        
-                        // 跳过按钮
-                        if !showingResult {
-                            Button("跳过此题") {
-                                skipQuestion()
-                            }
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
-                        }
-                    }
-                    .padding(.bottom, 30)
-                    .padding(.horizontal, DeviceType.isPad ? 40 : 0)
-                    .centerContent()
-                }
-            }
-        }
-        .background(Color(.systemGroupedBackground))
-    }
-    
-    // MARK: - Game Completion View
-    private var gameCompletionView: some View {
-        VStack(spacing: 30) {
-            Image(systemName: "star.fill")
-                .font(.system(size: 80))
-                .foregroundColor(.yellow)
-            
-            VStack(spacing: 10) {
-                Text("游戏完成！")
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                if let game = gameService.currentGame {
-                    VStack(spacing: 8) {
-                        Text("得分: \(game.score)分")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                        
-                        Text("正确率: \(game.correctCount)/\(game.questions.count)")
-                            .font(.headline)
-                            .foregroundColor(.secondary)
-                        
-                        let accuracy = Double(game.correctCount) / Double(game.questions.count) * 100
-                        Text(String(format: "%.0f%%", accuracy))
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-            
-            VStack(spacing: 15) {
-                Button(action: {
-                    gameService.startGame(type: gameType)
-                    selectedAnswer = nil
-                    showingResult = false
-                }) {
-                    Text("再玩一次")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(AppConstants.UI.cornerRadius)
-                }
-                
-                Button(action: {
-                    _ = gameService.endGame()
-                    dismiss()
-                }) {
-                    Text("返回")
-                        .font(.headline)
-                        .foregroundColor(.blue)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemBackground))
-                        .cornerRadius(AppConstants.UI.cornerRadius)
-                }
-            }
-            .padding(.horizontal, 40)
-        }
-    }
-    
-    // MARK: - Helper Methods
-    private func submitAnswer() {
-        if showingResult {
-            // 显示结果后，进入下一题
-            selectedAnswer = nil
-            showingResult = false
-            isCorrect = false
-            
-            // 移动到下一题（不要使用skipQuestion，它会跳过题目）
-            if var game = gameService.currentGame {
-                game.moveToNextQuestion()
-                gameService.currentGame = game
-                
-                // 检查游戏是否完成
-                if game.isFinished {
-                    _ = gameService.endGame()
-                }
-            }
-        } else if let answer = selectedAnswer {
-            // 提交答案 - 显示正确/错误反馈
-            isCorrect = gameService.answerQuestion(answer)
-            showingResult = true
-            
-            // 注意：不立即跳转，让用户看到反馈
-        }
-    }
-    
-    private func skipQuestion() {
-        selectedAnswer = nil
-        showingResult = false
-        isCorrect = false
-        
-        // 跳过当前题目
-        if var game = gameService.currentGame {
-            game.moveToNextQuestion()
-            gameService.currentGame = game
-            
-            if game.isFinished {
-                _ = gameService.endGame()
-            }
-        }
-    }
-}
-
-// MARK: - Game Progress Bar
-struct GameProgressBar: View {
-    let current: Int
-    let total: Int
-    let score: Int
-    
-    var body: some View {
-        VStack(spacing: 10) {
-            HStack {
-                Text("题目 \(current)/\(total)")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                
-                Spacer()
-                
-                HStack(spacing: 4) {
-                    Image(systemName: "star.fill")
-                        .font(.caption)
-                        .foregroundColor(.yellow)
-                    Text("\(score)分")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                }
-            }
-            
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(Color(.systemGray5))
-                        .frame(height: 8)
-                        .cornerRadius(4)
-                    
-                    Rectangle()
-                        .fill(Color.blue)
-                        .frame(width: geometry.size.width * (Double(current - 1) / Double(total)), height: 8)
-                        .cornerRadius(4)
-                }
-            }
-            .frame(height: 8)
-        }
-    }
-}
-
-// MARK: - Question Content View
-struct QuestionContentView: View {
-    let question: Question
-    @EnvironmentObject var dataService: DataService
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            // 问题提示
-            Text(question.prompt)
-                .font(.title3)
-                .fontWeight(.semibold)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            // 问题内容（卦象符号显示）
-            if let hexagram = dataService.getHexagram(by: question.hexagramId) {
-                // 使用垂直卦象视图
-                HexagramSymbolView(hexagram: hexagram, size: 140)
-                    .padding(.horizontal)
-            } else {
-                // 降级方案：使用文本显示
-                Text(question.content)
-                    .font(.system(size: 60, weight: .light))
-                    .foregroundColor(.primary)
-                    .padding(30)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(.systemBackground))
-                    .cornerRadius(AppConstants.UI.cornerRadius)
-                    .shadow(color: .black.opacity(0.05), radius: 5)
-                    .padding(.horizontal)
-            }
-        }
-    }
-}
-
-// MARK: - Answer Options View
-struct AnswerOptionsView: View {
-    let question: Question
-    @Binding var selectedAnswer: String?
-    let showingResult: Bool
-    let isCorrect: Bool
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            ForEach(question.options, id: \.self) { option in
-                AnswerOptionButton(
-                    option: option,
-                    isSelected: selectedAnswer == option,
-                    showingResult: showingResult,
-                    isCorrectAnswer: option == question.correctAnswer,
-                    isUserAnswer: selectedAnswer == option
-                ) {
-                    if !showingResult {
-                        selectedAnswer = option
-                    }
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Answer Option Button
-struct AnswerOptionButton: View {
-    let option: String
-    let isSelected: Bool
-    let showingResult: Bool
-    let isCorrectAnswer: Bool
-    let isUserAnswer: Bool
-    let action: () -> Void
-    
-    var backgroundColor: Color {
-        if showingResult {
-            if isCorrectAnswer {
-                return Color.green.opacity(0.2)
-            } else if isUserAnswer {
-                return Color.red.opacity(0.2)
-            }
-        } else if isSelected {
-            return Color.blue.opacity(0.2)
-        }
-        return Color(.systemBackground)
-    }
-    
-    var borderColor: Color {
-        if showingResult {
-            if isCorrectAnswer {
-                return Color.green
-            } else if isUserAnswer {
-                return Color.red
-            }
-        } else if isSelected {
-            return Color.blue
-        }
-        return Color(.systemGray4)
-    }
-    
-    var icon: String? {
-        if showingResult {
-            if isCorrectAnswer {
-                return "checkmark.circle.fill"
-            } else if isUserAnswer {
-                return "xmark.circle.fill"
-            }
-        }
-        return nil
-    }
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(option)
-                    .font(.body)
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.leading)
-                
-                Spacer()
-                
-                if let iconName = icon {
-                    Image(systemName: iconName)
-                        .foregroundColor(isCorrectAnswer ? .green : .red)
-                }
-            }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(backgroundColor)
-            .cornerRadius(AppConstants.UI.cornerRadius)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.UI.cornerRadius)
-                    .stroke(borderColor, lineWidth: 2)
-            )
-        }
-        .disabled(showingResult)
+        .padding(16)
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
     }
 }
 
@@ -611,54 +275,31 @@ struct GameRecordsView: View {
     @EnvironmentObject var storageService: StorageService
     
     var body: some View {
-        List {
-            ForEach(storageService.gameRecords) { record in
-                GameRecordDetailRow(record: record)
+        ZStack {
+            Color(hex: "F5F7F9")
+                .ignoresSafeArea()
+            
+            if storageService.gameRecords.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "doc.text.magnifyingglass")
+                        .font(.system(size: 48))
+                        .foregroundColor(Color(hex: "94A3B8"))
+                    Text("暂无游戏记录")
+                        .font(AppConstants.Fonts.medium(16))
+                        .foregroundColor(Color(hex: "64748B"))
+                }
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(storageService.gameRecords) { record in
+                            GameRecordRow(record: record)
+                        }
+                    }
+                    .padding(16)
+                }
             }
         }
         .navigationTitle("游戏记录")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-
-struct GameRecordDetailRow: View {
-    let record: GameRecord
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(record.gameType.rawValue)
-                    .font(.headline)
-                
-                Spacer()
-                
-                Text(record.rating)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color(record.ratingColor).opacity(0.2))
-                    .foregroundColor(Color(record.ratingColor))
-                    .cornerRadius(4)
-            }
-            
-            HStack {
-                Label("\(record.correctAnswers)/\(record.totalQuestions)", systemImage: "checkmark.circle")
-                Label("\(record.score)分", systemImage: "star.fill")
-                Label(record.formattedDuration, systemImage: "clock")
-            }
-            .font(.caption)
-            .foregroundColor(.secondary)
-            
-            Text(record.formattedDate)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-#Preview {
-    PracticeView()
-        .environmentObject(StorageService.shared)
-}
-

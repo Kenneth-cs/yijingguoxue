@@ -99,7 +99,8 @@ class GameService: ObservableObject {
                 content: hexagram.symbol,
                 correctAnswer: hexagram.name,
                 options: options,
-                hexagramId: hexagram.id
+                hexagramId: hexagram.id,
+                linePosition: nil
             )
         }
         
@@ -148,7 +149,8 @@ class GameService: ObservableObject {
                 content: hexagram.symbol,
                 correctAnswer: correctAnswer,
                 options: options,
-                hexagramId: hexagram.id
+                hexagramId: hexagram.id,
+                linePosition: nil
             )
         }
         
@@ -171,7 +173,8 @@ class GameService: ObservableObject {
                 content: hexagram.binary.toBinarySymbol(),
                 correctAnswer: hexagram.chineseName,
                 options: options,
-                hexagramId: hexagram.id
+                hexagramId: hexagram.id,
+                linePosition: nil
             )
         }
         
@@ -202,7 +205,8 @@ class GameService: ObservableObject {
                 content: hexagram.symbol,
                 correctAnswer: line.text,
                 options: options,
-                hexagramId: hexagram.id
+                hexagramId: hexagram.id,
+                linePosition: line.position
             )
         }
         
@@ -220,6 +224,8 @@ struct Game {
     var currentQuestionIndex = 0
     var correctCount = 0
     var score = 0
+    var currentStreak = 0
+    var maxStreak = 0
     
     init(type: GameRecord.GameType, questions: [Question]) {
         self.type = type
@@ -249,6 +255,12 @@ struct Game {
         if isCorrect {
             correctCount += 1
             score += 10 // 每题10分
+            currentStreak += 1
+            if currentStreak > maxStreak {
+                maxStreak = currentStreak
+            }
+        } else {
+            currentStreak = 0
         }
         // 注意：不自动跳到下一题，让UI控制何时跳转
     }
@@ -268,6 +280,7 @@ struct Question: Identifiable {
     let correctAnswer: String   // 正确答案
     let options: [String]       // 选项（用于选择题）
     let hexagramId: Int         // 关联的卦象ID
+    let linePosition: Int?      // 关联的爻位（仅用于爻辞配对）
     
     enum QuestionType {
         case multipleChoice     // 选择题

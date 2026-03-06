@@ -12,18 +12,26 @@ struct HexagramSymbolView: View {
     let hexagram: Hexagram
     let size: CGFloat
     let color: Color
+    let highlightPosition: Int?
+    let highlightColor: Color
     
-    init(hexagram: Hexagram, size: CGFloat = 120, color: Color = .primary) {
+    init(hexagram: Hexagram, size: CGFloat = 120, color: Color = .primary, highlightPosition: Int? = nil, highlightColor: Color = .red) {
         self.hexagram = hexagram
         self.size = size
         self.color = color
+        self.highlightPosition = highlightPosition
+        self.highlightColor = highlightColor
     }
     
     var body: some View {
         VStack(spacing: size * 0.12) {
             // 从上往下显示六爻（position 6 到 1）
             ForEach(hexagram.lines.reversed(), id: \.position) { line in
-                LineSymbol(isYang: line.isYang, width: size, color: color)
+                LineSymbol(
+                    isYang: line.isYang, 
+                    width: size, 
+                    color: (highlightPosition == line.position) ? highlightColor : color
+                )
             }
         }
         .frame(width: size * 1.3) // 限制整体宽度

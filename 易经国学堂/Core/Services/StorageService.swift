@@ -257,12 +257,23 @@ class StorageService: ObservableObject {
     
     /// 导出数据（用于备份）
     func exportData() -> [String: Any] {
-        [
-            "studyProgress": try? JSONEncoder().encode(studyProgress),
-            "gameRecords": try? JSONEncoder().encode(gameRecords),
-            "studyNotes": try? JSONEncoder().encode(studyNotes),
-            "exportDate": Date()
-        ].compactMapValues { $0 }
+        var data: [String: Any] = [:]
+        
+        if let studyProgressData = try? JSONEncoder().encode(studyProgress) {
+            data["studyProgress"] = studyProgressData
+        }
+        
+        if let gameRecordsData = try? JSONEncoder().encode(gameRecords) {
+            data["gameRecords"] = gameRecordsData
+        }
+        
+        if let studyNotesData = try? JSONEncoder().encode(studyNotes) {
+            data["studyNotes"] = studyNotesData
+        }
+        
+        data["exportDate"] = Date()
+        
+        return data
     }
 }
 
