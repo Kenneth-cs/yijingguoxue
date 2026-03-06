@@ -46,34 +46,54 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            // 首页 - 描边房子图标
+            // 首页 - 自定义图标
             HomeView()
                 .tabItem {
-                    Label("首页", systemImage: "house")
+                    Label {
+                        Text("首页")
+                    } icon: {
+                        Image("tab_首页")
+                            .renderingMode(.template)
+                    }
                 }
                 .tag(0)
 
-            // 百科 - 描边书本图标
+            // 百科 - 自定义图标
             NavigationView {
                 EncyclopediaView()
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
-                Label("百科", systemImage: "books.vertical")
+                Label {
+                    Text("百科")
+                } icon: {
+                    Image("tab_百科")
+                        .renderingMode(.template)
+                }
             }
             .tag(1)
 
-            // 练习 - 描边毕业帽图标
+            // 练习 - 自定义图标
             PracticeView()
                 .tabItem {
-                    Label("练习", systemImage: "graduationcap")
+                    Label {
+                        Text("练习")
+                    } icon: {
+                        Image("tab_练习")
+                            .renderingMode(.template)
+                    }
                 }
                 .tag(2)
 
-            // 我的 - 描边人物图标
+            // 我的 - 自定义图标
             ProfileView()
                 .tabItem {
-                    Label("我的", systemImage: "person")
+                    Label {
+                        Text("我的")
+                    } icon: {
+                        Image("tab_我的")
+                            .renderingMode(.template)
+                    }
                 }
                 .tag(3)
         }

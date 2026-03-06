@@ -111,45 +111,54 @@ enum AppConstants {
         )
     }
     
-    // MARK: - 字体系统（全局使用宋体 Songti SC）
+    // MARK: - 字体系统（全局宋体 Songti SC，三档字重）
     enum Fonts {
-        // 宋体名称常量，iOS 系统内置
-        private static let songtiName = "Songti SC"
+        /*
+         Songti SC 在 iOS 上实际可用的字体文件名：
+           - "Songti SC"        → Regular（正文、说明）
+           - "Songti SC Bold"   → Bold（主标题、大号数字）
+           - "Songti SC Light"  → Light（辅助文字、小字）
+         使用 Font.custom 直接指定字体名称，最可靠。
+        */
 
-        // 宋体标题（用于卦名、章节标题等需要古典气质的地方）
-        static func serifTitle(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
-            let uiWeight: UIFont.Weight
-            switch weight {
-            case .bold:     uiWeight = .bold
-            case .semibold: uiWeight = .semibold
-            case .medium:   uiWeight = .medium
-            case .light:    uiWeight = .light
-            default:        uiWeight = .regular
-            }
-            // 通过 UIFont 确保正确加载宋体，再桥接到 SwiftUI Font
-            let descriptor = UIFontDescriptor(name: songtiName, size: size)
-            let uiFont = UIFont(descriptor: descriptor.addingAttributes([
-                .traits: [UIFontDescriptor.TraitKey.weight: uiWeight]
-            ]), size: size)
-            return Font(uiFont)
+        /// 粗体宋体 —— 用于页面主标题、卦名、重要数字
+        static func bold(_ size: CGFloat) -> Font {
+            Font.custom("Songti SC Bold", size: size)
         }
 
-        // 宋体正文（用于卦辞、解读等内容文字）
+        /// 常规宋体 —— 用于正文、卦辞、按钮文字
+        static func regular(_ size: CGFloat) -> Font {
+            Font.custom("Songti SC", size: size)
+        }
+
+        /// 细体宋体 —— 用于辅助说明、标签、时间等小字
+        static func light(_ size: CGFloat) -> Font {
+            Font.custom("Songti SC Light", size: size)
+        }
+
+        // ── 预定义尺寸（按用途分三档字重）──────────────────────
+        static let largeTitle  = bold(32)      // 超大标题（封面级）
+        static let title1      = bold(24)      // 页面大标题
+        static let title2      = bold(20)      // 卡片标题
+        static let title3      = bold(18)      // 章节标题
+        static let headline    = bold(17)      // 小节标题、按钮
+        static let bodyText    = regular(16)   // 主正文
+        static let callout     = regular(15)   // 次正文、卦辞
+        static let subheadline = regular(14)   // 副标题、描述
+        static let caption     = light(13)     // 辅助说明
+        static let caption2    = light(12)     // 小标签、时间
+
+        // ── 兼容旧调用（部分 View 仍使用 serifTitle / body）──────
+        static func serifTitle(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
+            switch weight {
+            case .bold, .heavy, .black: return bold(size)
+            case .light, .thin, .ultraLight: return light(size)
+            default: return regular(size)
+            }
+        }
         static func body(size: CGFloat, weight: Font.Weight = .regular) -> Font {
             return serifTitle(size: size, weight: weight)
         }
-
-        // 预定义尺寸
-        static let largeTitle  = serifTitle(size: 32, weight: .bold)
-        static let title1      = serifTitle(size: 24, weight: .semibold)
-        static let title2      = serifTitle(size: 20, weight: .semibold)
-        static let title3      = serifTitle(size: 18, weight: .semibold)
-        static let headline    = serifTitle(size: 17, weight: .semibold)
-        static let bodyText    = serifTitle(size: 16, weight: .regular)
-        static let callout     = serifTitle(size: 15, weight: .regular)
-        static let subheadline = serifTitle(size: 14, weight: .regular)
-        static let caption     = serifTitle(size: 13, weight: .regular)
-        static let caption2    = serifTitle(size: 12, weight: .regular)
     }
 }
 

@@ -15,9 +15,19 @@ private let textMid       = Color(red: 0.28, green: 0.33, blue: 0.41)
 private let textLight     = Color(red: 0.58, green: 0.64, blue: 0.72)
 private let textLabel     = Color(red: 0.39, green: 0.45, blue: 0.55)
 
-/// 全局宋体字体帮助函数（首页内所有文字统一使用 Songti SC）
+/// 首页宋体字体帮助函数
+/// - weight: .bold → Songti SC Bold（标题）
+///           .regular/.medium → Songti SC（正文）
+///           .light/.thin → Songti SC Light（辅助小字）
 private func ST(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
-    Font.custom("Songti SC", size: size).weight(weight)
+    switch weight {
+    case .bold, .heavy, .black, .semibold:
+        return Font.custom("Songti SC Bold", size: size)
+    case .light, .thin, .ultraLight:
+        return Font.custom("Songti SC Light", size: size)
+    default:
+        return Font.custom("Songti SC", size: size)
+    }
 }
 
 struct HomeView: View {
