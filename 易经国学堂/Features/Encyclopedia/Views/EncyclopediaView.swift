@@ -51,6 +51,9 @@ struct EncyclopediaView: View {
         }
         .navigationTitle("易经百科")
         .navigationBarHidden(true)
+        .onAppear {
+            EventTracker.shared.trackWikiViewPage()
+        }
     }
     
     // MARK: - 1. Search Bar（含可选返回按钮）
@@ -122,6 +125,13 @@ struct EncyclopediaView: View {
                 HexagramListCell(hexagram: hexagram)
             }
             .buttonStyle(PlainButtonStyle())
+            .simultaneousGesture(TapGesture().onEnded {
+                EventTracker.shared.trackWikiClickArticle(
+                    articleId:   "hexagram_\(hexagram.id)",
+                    articleName: hexagram.chineseName,
+                    category:    "六十四卦"
+                )
+            })
         }
     }
     
@@ -131,6 +141,13 @@ struct EncyclopediaView: View {
                 TrigramListCell(trigram: trigram)
             }
             .buttonStyle(PlainButtonStyle())
+            .simultaneousGesture(TapGesture().onEnded {
+                EventTracker.shared.trackWikiClickArticle(
+                    articleId:   "trigram_\(trigram.id)",
+                    articleName: trigram.name,
+                    category:    "八经卦"
+                )
+            })
         }
     }
     

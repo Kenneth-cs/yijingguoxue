@@ -40,6 +40,8 @@ class GameService: ObservableObject {
         }
         
         isGameActive = true
+        // 埋点：开始游戏训练
+        EventTracker.shared.trackGameStartTraining(gameType: type.rawValue)
     }
     
     /// 回答问题
@@ -66,6 +68,14 @@ class GameService: ObservableObject {
         )
         
         storageService.addGameRecord(record)
+
+        // 埋点：完成游戏训练
+        let durationSec = Int(Date().timeIntervalSince(game.startTime))
+        EventTracker.shared.trackGameFinishTraining(
+            gameType:    game.type.rawValue,
+            score:       game.score,
+            durationSec: durationSec
+        )
         
         currentGame = nil
         isGameActive = false

@@ -125,6 +125,13 @@ extension HomeView {
             .padding(.horizontal, 20)
         }
         .frame(height: 148)
+        .onTapGesture {
+            EventTracker.shared.trackHomeClickBanner(
+                bannerId:   "b_home_001",
+                bannerName: "欢迎学习易经",
+                targetUrl:  ""
+            )
+        }
     }
 }
 

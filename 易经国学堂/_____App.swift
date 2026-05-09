@@ -27,11 +27,26 @@ struct YiJingApp: App {
                 .onAppear {
                     // 启动时申请权限并（如已开启）调度通知
                     notificationService.requestPermission()
+                    // 埋点：App 启动（DAU 兜底事件）
+                    trackAppLaunch()
                 }
         }
     }
     
     /// 配置全局外观
+    // MARK: - 埋点：App 启动
+    private func trackAppLaunch() {
+        // 利用 UserDefaults 判断当日是否首次打开
+        let key = "lastLaunchDate"
+        let today = Calendar.current.startOfDay(for: Date())
+        let lastDate = UserDefaults.standard.object(forKey: key) as? Date
+        let isFirstOpen = lastDate == nil || lastDate! < today
+        if isFirstOpen {
+            UserDefaults.standard.set(today, forKey: key)
+        }
+        EventTracker.shared.trackAppLaunch(isFirstOpen: isFirstOpen)
+    }
+
     private func setupAppearance() {
         // 全局 tint 颜色：所有返回按钮、链接控件统一为主题绿
         let themeGreen = UIColor(red: 0.03, green: 0.42, blue: 0.32, alpha: 1.0)

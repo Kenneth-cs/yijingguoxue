@@ -43,9 +43,15 @@ struct PracticeView: View {
                     NavigationLink(destination: GuessGameView()) {
                         PracticeCard(icon: "square.grid.2x2", title: "认卦游戏", subtitle: "识别六十四卦象")
                     }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        EventTracker.shared.trackGameClickEntrance(gameType: "认卦游戏")
+                    })
                     NavigationLink(destination: QuizView()) {
                         PracticeCard(icon: "questionmark.circle", title: "知识问答", subtitle: "经传理论考核")
                     }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        EventTracker.shared.trackGameClickEntrance(gameType: "知识问答")
+                    })
                 }
                 .padding(.horizontal, 16)
 
@@ -54,9 +60,15 @@ struct PracticeView: View {
                     NavigationLink(destination: SymbolGameView()) {
                         PracticeCard(icon: "eye", title: "卦象识别", subtitle: "快速分辨阴阳爻")
                     }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        EventTracker.shared.trackGameClickEntrance(gameType: "卦象识别")
+                    })
                     NavigationLink(destination: LineMatchingView()) {
                         PracticeCard(icon: "list.dash", title: "爻辞匹对", subtitle: "对应位阶与涵义")
                     }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        EventTracker.shared.trackGameClickEntrance(gameType: "爻辞匹对")
+                    })
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
@@ -109,6 +121,11 @@ struct PracticeView: View {
     // 已安装：App Store 页面显示「打开」按钮直接启动
     // 未安装：App Store 页面显示「获取」按钮引导下载
     private func openCoachApp() {
+        EventTracker.shared.trackPracticeClickBanner(
+            bannerId:   "b_practice_001",
+            bannerName: "人生教练导流Banner",
+            targetUrl:  coachAppStoreURL.absoluteString
+        )
         UIApplication.shared.open(coachAppStoreURL)
     }
 }
